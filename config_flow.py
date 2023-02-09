@@ -9,7 +9,6 @@ from .const import * #
 # pylint: enable=unused-wildcard-import
 import voluptuous as vol
 from homeassistant.const import (
-    CONF_PASSWORD,
     CONF_USERNAME,
     CONF_IP_ADDRESS,
     CONF_SCAN_INTERVAL,
