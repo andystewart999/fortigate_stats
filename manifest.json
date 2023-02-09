@@ -1,9 +1,9 @@
 {
-    "domain": "snmp_stats",
-    "name": "snmp_stats",
-    "documentation": "https://www.weltmeyer.net",
+    "domain": "fortigate_stats",
+    "name": "fortigate_stats",
+    "documentation": "https://github.com/andystewart999/fortigate_stats",
     "dependencies": [],
-    "codeowners": ["@weltmeyer"],
+    "codeowners": ["@andystewart999"],
     "requirements": ["pysnmp"],
     "config_flow": true,
     "version": "0.1.0"
