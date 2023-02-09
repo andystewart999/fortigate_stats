@@ -5,13 +5,10 @@ import voluptuous as vol
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import (
-    CONF_PASSWORD,
     CONF_USERNAME,
     CONF_IP_ADDRESS,
     CONF_SCAN_INTERVAL
 )
-
-
 
 async def async_setup(hass, config):
     hass.data.setdefault(DOMAIN, {})
