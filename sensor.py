@@ -13,7 +13,6 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.entity import Entity
 
 from homeassistant.const import (
-    CONF_PASSWORD,
     CONF_USERNAME,
     CONF_IP_ADDRESS,
     EVENT_HOMEASSISTANT_STOP, 
@@ -25,7 +24,6 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
     """Set up the sensor platform."""
     LOGGER.info('SETUP_ENTRY')
     #username=config_entry.data.get(CONF_USERNAME)
-    #password=config_entry.data.get(CONF_PASSWORD)
     ipaddress=config_entry.data.get(CONF_IP_ADDRESS)
     updateIntervalSeconds=config_entry.options.get(CONF_SCAN_INTERVAL)
     maxretries=3
@@ -113,10 +111,10 @@ class SnmpStatisticsMonitor:
         self.stat_time=0
         self.target_ip=target_ip
         self.hostname=None
-        self.cpuload1=None
-        self.cpuload2=None
-        self.cpuload3=None
-        self.update_stats()#try this to throw error if not working.
+        self.cpuusage=None
+        self.ramusage=None
+        self.diskusage=None
+        self.update_stats() #try this to throw error if not working.
         if async_add_entities is not None:
             self.setupEntities()
 
@@ -192,119 +190,144 @@ class SnmpStatisticsMonitor:
         self.update_netif_stats()
         more_data=__class__.get(self.target_ip,[
             '1.3.6.1.2.1.1.5.0',
-            '1.3.6.1.4.1.2021.10.1.3.1',
-            '1.3.6.1.4.1.2021.10.1.3.2',
-            '1.3.6.1.4.1.2021.10.1.3.3',
-            ],hlapi.CommunityData('public'))
+            '1.3.6.1.4.1.12356.101.4.1.3.0',
+            '1.3.6.1.4.1.12356.101.4.1.4.0',
+            ],hlapi.CommunityData('admin'))  # Change this hardcoded community reference later
+        
+        #hostname
+        #cpu
+        #ram
+        
         
         
         #cpu usage://1.3.6.1.2.1.25.3.3[.1...4]
-        cpu_usages= __class__.get_bulk(self.target_ip, [
-            '1.3.6.1.2.1.25.3.3',
-        ], hlapi.CommunityData('public', mpModel=1), 
-            32 
-        )
+#        cpu_usages= __class__.get_bulk(self.target_ip, [
+#            '1.3.6.1.4.1.12356.101.4.1.3.0',
+#        ], hlapi.CommunityData('admin', mpModel=1),   
+#            32 
+#        )   # Change this hardcoded community reference later
+#
+#                cpu_usages= __class__.get_bulk(self.target_ip, [
+#            '1.3.6.1.4.1.12356.101.4.1.3.0',
+#        ], hlapi.CommunityData('admin', mpModel=1),   
+#            32 
+#        )   # Change this hardcoded community reference later
 
         
+   
         #print(more_data)
         #print(more_data['1.3.6.1.4.1.2021.10.1.1'])
         #print(more_data['1.3.6.1.2.1.1.5.0'])
         #for k,v in more_data:
         #    print(f"{k}:{v}")
         self.hostname=more_data['1.3.6.1.2.1.1.5.0']
-        self.cpuload1=more_data['1.3.6.1.4.1.2021.10.1.3.1']
-        self.cpuload2=more_data['1.3.6.1.4.1.2021.10.1.3.2']
-        self.cpuload3=more_data['1.3.6.1.4.1.2021.10.1.3.3']
+        self.cpuusage=more_data['1.3.6.1.4.1.12356.101.4.1.3.0']
+        self.ramusage=more_data['1.3.6.1.4.1.12356.101.4.1.4.0']
+        #self.cpuload3=more_data['1.3.6.1.4.1.2021.10.1.3.3']
 
-    def update_netif_stats(self):
-        if_data=self.current_if_data
-        its = __class__.get_bulk_auto(self.target_ip, [
-            '1.3.6.1.2.1.2.2.1.2',#v1, ifDescr
-            #'1.3.6.1.2.1.2.2.1.16',#v1, ifOutOctets
-            #'1.3.6.1.2.1.2.2.1.10',#v1, ifInOctets
-            '1.3.6.1.2.1.31.1.1.1.1',#v2, ifName
-            '1.3.6.1.2.1.31.1.1.1.18',#v2, ifAlias
-            '1.3.6.1.2.1.31.1.1.1.6', #v2, ifHCInOctets
-            '1.3.6.1.2.1.31.1.1.1.10', #v2, ifHCOutOctets
-        ], hlapi.CommunityData('public', mpModel=1), 
-            '1.3.6.1.2.1.2.1.0' #v1, ifCount
-        )
+#    def update_netif_stats(self):
+#        if_data=self.current_if_data
+#        its = __class__.get_bulk_auto(self.target_ip, [
+#            '1.3.6.1.2.1.2.2.1.2',#v1, ifDescr
+#            #'1.3.6.1.2.1.2.2.1.16',#v1, ifOutOctets
+#            #'1.3.6.1.2.1.2.2.1.10',#v1, ifInOctets
+#            '1.3.6.1.2.1.31.1.1.1.1',#v2, ifName
+#            '1.3.6.1.2.1.31.1.1.1.18',#v2, ifAlias
+#            '1.3.6.1.2.1.31.1.1.1.6', #v2, ifHCInOctets
+#            '1.3.6.1.2.1.31.1.1.1.10', #v2, ifHCOutOctets
+#        ], hlapi.CommunityData('public', mpModel=1), 
+#            '1.3.6.1.2.1.2.1.0' #v1, ifCount
+#        )
+
+
+#        cpu_usages= __class__.get_bulk(self.target_ip, [
+#            '1.3.6.1.4.1.12356.101.4.1.3.0',
+#        ], hlapi.CommunityData('admin', mpModel=1),   
+#            32 
+#        )   # Change this hardcoded community reference later
+
+#    def update_netif_stats(self):
+#        if_data=self.current_if_data
+#        its = __class__.get_bulk(self.target_ip, ['1.3.6.1.4.1.12356.101.4.5.3.1.8.1',#v2,ifSessions], hlapi.CommunityData('admin', mpModel=1), 
+#            '1.3.6.1.2.1.2.1.0' #v1, ifCount
+#        )
 
         
+        
+        
 
-        for k in if_data:
-            if_data[k]['rx_octets_prev']=if_data[k]['rx_octets']
-            if_data[k]['tx_octets_prev']=if_data[k]['tx_octets']
+ #       for k in if_data:
+ #           if_data[k]['rx_octets_prev']=if_data[k]['rx_octets']
+ #           if_data[k]['tx_octets_prev']=if_data[k]['tx_octets']
+#
 
-
-
-        for it in its:
-            for k, v in it.items():
-                oidParts=k.split('.')
-                ifId=oidParts[-1]
-                infotype=oidParts[-2]
-                if ifId not in if_data:
-                    if_data[ifId]={
-                        'name':'',
-                        'name2':'',
-                        'alias':'',
-                        'rx_octets':-1,
-                        'tx_octets':-1,
-                        'rx_speed_octets':-1.0,
-                        'tx_speed_octets':-1.0,
-                        'rx_octets_prev':-1.0,
-                        'tx_octets_prev':-1.0,
-                        'last_stat_time':time.time(),
-                        'rx_diff':-1,
-                        'tx_diff':-1
-                        }
-                
-                if infotype=='2':
-                    if_data[ifId]['name']=v
-                elif infotype=='1':
-                    if_data[ifId]['name2']=v
-                elif infotype=='18':
-                    if_data[ifId]['alias']=v
-                elif k.find('2.2.1.10')>-1:
-                    if_data[ifId]['rx_octets']=v
-                elif k.find('2.2.1.16')>-1:
-                    if_data[ifId]['tx_octets']=v
-                elif k.find('31.1.1.1.6')>-1:
-                    if_data[ifId]['rx_octets']=v
-                elif k.find('31.1.1.1.10')>-1:
-                    if_data[ifId]['tx_octets']=v
+#        for it in its:
+#            for k, v in it.items():
+#                oidParts=k.split('.')
+#                ifId=oidParts[-1]
+#                infotype=oidParts[-2]
+#                if ifId not in if_data:
+#                    if_data[ifId]={
+#                        'name':'',
+#                        'name2':'',
+#                        'alias':'',
+#                        'rx_octets':-1,
+#                        'tx_octets':-1,
+#                        'rx_speed_octets':-1.0,
+#                        'tx_speed_octets':-1.0,
+#                        'rx_octets_prev':-1.0,
+#                        'tx_octets_prev':-1.0,
+#                        'last_stat_time':time.time(),
+#                        'rx_diff':-1,
+#                        'tx_diff':-1
+#                        }
+#                
+#                if infotype=='2':
+#                    if_data[ifId]['name']=v
+#                elif infotype=='1':
+#                    if_data[ifId]['name2']=v
+#                elif infotype=='18':
+#                    if_data[ifId]['alias']=v
+#                elif k.find('2.2.1.10')>-1:
+#                    if_data[ifId]['rx_octets']=v
+#                elif k.find('2.2.1.16')>-1:
+#                    if_data[ifId]['tx_octets']=v
+#                elif k.find('31.1.1.1.6')>-1:
+#                    if_data[ifId]['rx_octets']=v
+#                elif k.find('31.1.1.1.10')>-1:
+#                    if_data[ifId]['tx_octets']=v
 
 
         new_if_data_time=time.time()
-        for k in self.current_if_data:
-            cur_data=self.current_if_data[k]
+        #for k in self.current_if_data:
+            #cur_data=self.current_if_data[k]
             
-            timediff_statistics=new_if_data_time-cur_data['last_stat_time']
-            timediff_stat_seconds=timediff_statistics#/1000.0
+            #timediff_statistics=new_if_data_time-cur_data['last_stat_time']
+            #timediff_stat_seconds=timediff_statistics#/1000.0
 
-            rx_diff=cur_data['rx_octets']-cur_data['rx_octets_prev']
-            tx_diff=cur_data['tx_octets']-cur_data['tx_octets_prev']
-
-
-            cur_data['rx_diff']=rx_diff
-            cur_data['tx_diff']=tx_diff
-
-            if timediff_stat_seconds<1:
-                continue
-
-            if rx_diff==0 and tx_diff==0 and timediff_stat_seconds<4:##wait until really going to 0
-                continue
-
-            rx_byte_s=rx_diff/timediff_stat_seconds
-            tx_byte_s=tx_diff/timediff_stat_seconds
-            cur_data['last_stat_time']=new_if_data_time
-
-            cur_data['rx_speed_octets']=rx_byte_s
-            cur_data['tx_speed_octets']=tx_byte_s
+            #rx_diff=cur_data['rx_octets']-cur_data['rx_octets_prev']
+            #tx_diff=cur_data['tx_octets']-cur_data['tx_octets_prev']
 
 
-        self.current_if_data=if_data
-        self.current_if_data_time=new_if_data_time
+            #cur_data['rx_diff']=rx_diff
+            #cur_data['tx_diff']=tx_diff
+
+            #if timediff_stat_seconds<1:
+                #continue
+
+            #if rx_diff==0 and tx_diff==0 and timediff_stat_seconds<4:##wait until really going to 0
+                #continue
+
+            #rx_byte_s=rx_diff/timediff_stat_seconds
+            #tx_byte_s=tx_diff/timediff_stat_seconds
+            #cur_data['last_stat_time']=new_if_data_time
+
+            #cur_data['rx_speed_octets']=rx_byte_s
+            #cur_data['tx_speed_octets']=tx_byte_s
+
+
+        #self.current_if_data=if_data
+        #self.current_if_data_time=new_if_data_time
 
     def start(self):
         threading.Thread(target=self.watcher).start()
@@ -355,40 +378,40 @@ class SnmpStatisticsMonitor:
         
     def AddOrUpdateEntities(self):
         allSensorsPrefix="sensor."+DOMAIN+"_"+self.target_ip.replace('.','_')+"_"
-        for k in self.current_if_data:
-            cur_if_data=self.current_if_data[k]
-            if_name=cur_if_data['name2']
-            if_alias=cur_if_data['alias']
+        #for k in self.current_if_data:
+        #    cur_if_data=self.current_if_data[k]
+        #    if_name=cur_if_data['name2']
+        #    if_alias=cur_if_data['alias']
 
-            if_rx_mbit=cur_if_data['rx_speed_octets']*8/1000/1000
-            if_tx_mbit=cur_if_data['tx_speed_octets']*8/1000/1000
-            if_rx_mbyte=cur_if_data['rx_speed_octets']/1000/1000
-            if_tx_mbyte=cur_if_data['tx_speed_octets']/1000/1000
-
-
-
-            if_rx_total_mbit=cur_if_data['rx_octets']*8/1000/1000
-            if_tx_total_mbit=cur_if_data['tx_octets']*8/1000/1000
+            #if_rx_mbit=cur_if_data['rx_speed_octets']*8/1000/1000
+            #if_tx_mbit=cur_if_data['tx_speed_octets']*8/1000/1000
+            #if_rx_mbyte=cur_if_data['rx_speed_octets']/1000/1000
+            #if_tx_mbyte=cur_if_data['tx_speed_octets']/1000/1000
 
 
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_name+" BW Out (mbit)",round(if_tx_mbit,2),'mbit/s')
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_name+" BW In (mbit)",round(if_rx_mbit,2),'mbit/s')
 
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')
+            #if_rx_total_mbit=cur_if_data['rx_octets']*8/1000/1000
+            #if_tx_total_mbit=cur_if_data['tx_octets']*8/1000/1000
 
 
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_out_mbit',if_name+" Total Out (mbit)",round(if_tx_total_mbit,2),'mbit')
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_in_mbit',if_name+" Total In (mbit)",round(if_rx_total_mbit,2),'mbit')
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_name+" BW Out (mbit)",round(if_tx_mbit,2),'mbit/s')
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_name+" BW In (mbit)",round(if_rx_mbit,2),'mbit/s')
+
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')
+
+
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_out_mbit',if_name+" Total Out (mbit)",round(if_tx_total_mbit,2),'mbit')
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_in_mbit',if_name+" Total In (mbit)",round(if_rx_total_mbit,2),'mbit')
             
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_out_byte',if_name+" Total Out (bytes)",cur_if_data['tx_octets'],'byte')
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_in_byte',if_name+" Total In (bytes)",cur_if_data['rx_octets'],'byte')
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_out_byte',if_name+" Total Out (bytes)",cur_if_data['tx_octets'],'byte')
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_in_byte',if_name+" Total In (bytes)",cur_if_data['rx_octets'],'byte')
 
 
 
-        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_1","CPU Avg 1",self.cpuload1*100,'%')
-        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_2","CPU Avg 2",self.cpuload2*100,'%')
-        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
+        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpuusage*100,'%')
+        self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ramusage*100,'%')
+        #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
         
 
 
