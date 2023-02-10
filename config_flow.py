@@ -32,6 +32,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         #password = user_input[CONF_PASSWORD]
         #ipaddress=user_input[CONF_IP_ADDRESS]
         ipaddress = "10.0.0.1"
+        #dummy
         
         try:
             SnmpStatisticsMonitor(ipaddress)
@@ -45,7 +46,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         return self.async_create_entry(
             title=user_input[CONF_IP_ADDRESS],
             data={
-                #CONF_USERNAME: username,
+                CONF_USERNAME: username,
                 #CONF_PASSWORD: password,
                 CONF_IP_ADDRESS: ipaddress,
             },
