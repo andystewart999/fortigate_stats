@@ -27,9 +27,11 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         if not user_input:
             return self._show_form()
 
-        username = user_input[CONF_USERNAME]
+        #username = user_input[CONF_USERNAME]
+        username = "admin"
         #password = user_input[CONF_PASSWORD]
-        ipaddress=user_input[CONF_IP_ADDRESS]
+        #ipaddress=user_input[CONF_IP_ADDRESS]
+        ipaddress = "10.0.0.1"
         
         try:
             SnmpStatisticsMonitor(ipaddress)
