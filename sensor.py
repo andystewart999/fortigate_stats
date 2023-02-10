@@ -409,8 +409,8 @@ class SnmpStatisticsMonitor:
 
 
 
-        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpuusage*100,'%')
-        self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ramusage*100,'%')
+        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpuusage,'%')
+        self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ramusage,'%')
         #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
         
 
