@@ -187,7 +187,7 @@ class SnmpStatisticsMonitor:
 
     #endregion
     def update_stats(self):
-        self.update_netif_stats()
+        #self.update_netif_stats()
         more_data=__class__.get(self.target_ip,[
             '1.3.6.1.2.1.1.5.0',
             '1.3.6.1.4.1.12356.101.4.1.3.0',
