@@ -52,9 +52,10 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
 
 
 class SnmpStatisticsSensor(Entity):
-    def __init__(self,id,name=None):
+    def __init__(self,id,name=None,config_entry=None):
         self._attributes = {}
         self._state ="NOTRUN"
+        self._config_entry = config_entry
         self.entity_id=id
         if name is None:
             name=id
@@ -68,7 +69,6 @@ class SnmpStatisticsSensor(Entity):
         self._state = state
         if self.enabled:
             self.schedule_update_ha_state()
-
 
     def set_attributes(self, attributes):
         """Set the state attributes."""
@@ -95,21 +95,29 @@ class SnmpStatisticsSensor(Entity):
         return self._state
 
     @property
+    def unit_of_measurement(self):
+        """Return the unit the value is expressed in."""
+        return self._measurement
+
+    @property
     def name(self):
         """Return the name of the sensor."""
         return self._name
 
     @property
-    def device_info(self) -> DeviceInfo:
+    def device_info(self):
         """Return device info for this sensor."""
-        return DeviceInfo(
-          identifiers={
-            (DOMAIN, self.unique_id)
-          },
-          name=self._name,
-          manufacturer="Fortinet",
-          model="100D",
-          sw_version="1.0",
+    #    if self._config_entry is None:
+    #        identifier = {(DOMAIN, self.config["ipaddress"].replace(".", "_"))}
+    #    else:
+    #        identifier = {(DOMAIN, self._config_entry,entry_id)}
+        identifier = {(DOMAIN, "10_0_0_1")}
+        return {
+          "identifiers": identifier,
+          "name": "FortiGate stats",
+          "manufacturer": "Fortinet",
+          "model": "FortiGate 100D",
+          "sw_version": "1.0",
         }
 
     def update(self):
@@ -381,9 +389,10 @@ class SnmpStatisticsMonitor:
         else:
             sensor=SnmpStatisticsSensor(id,friendlyname)
             sensor._state=value
+            sensor._measurement = unit
             sensor.set_attributes(
                     {
-                        "unit_of_measurement":unit,
+                        #"native_unit_of_measurement":unit,
                         #"device_class":"power",
                         "friendly_name":friendlyname
                     }
