@@ -79,23 +79,39 @@ class SnmpStatisticsSensor(Entity):
         """Return the unique ID for this sensor."""
         return self.entity_id
 
-
     @property
     def should_poll(self):
         """Only poll to update phonebook, if defined."""
         return False
+
     @property
     def device_state_attributes(self):
         """Return the state attributes."""
         return self._attributes
+
     @property
     def state(self):
         """Return the state of the device."""
         return self._state
+
     @property
     def name(self):
         """Return the name of the sensor."""
         return self._name
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return device info for this sensor."""
+          return DeviceInfo(
+            identifiers={
+              (DOMAIN, self.unique_id)
+            },
+            name=self.name,
+            manufacturer="Fortinet",
+            model="100D",
+            sw_version="1.0",
+          }
+
     def update(self):
         LOGGER.info("update "+self.entity_id)
 
