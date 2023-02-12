@@ -106,7 +106,7 @@ class SnmpStatisticsSensor(Entity):
             identifiers={
               (DOMAIN, self.unique_id)
             },
-            name=self.name,
+            name=self._name,
             manufacturer="Fortinet",
             model="100D",
             sw_version="1.0",
