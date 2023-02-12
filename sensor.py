@@ -102,15 +102,15 @@ class SnmpStatisticsSensor(Entity):
     @property
     def device_info(self) -> DeviceInfo:
         """Return device info for this sensor."""
-          return DeviceInfo(
-            identifiers={
-              (DOMAIN, self.unique_id)
-            },
-            name=self._name,
-            manufacturer="Fortinet",
-            model="100D",
-            sw_version="1.0",
-          }
+        return DeviceInfo(
+          identifiers={
+            (DOMAIN, self.unique_id)
+          },
+          name=self._name,
+          manufacturer="Fortinet",
+          model="100D",
+          sw_version="1.0",
+        }
 
     def update(self):
         LOGGER.info("update "+self.entity_id)
