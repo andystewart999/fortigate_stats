@@ -1,12 +1,69 @@
-"""ESXi commands for ESXi Stats component."""
+"""SNMP commands for the FortiGate Stats component."""
 
+from pysnmp import hlapi
+from pysnmp.error import PySnmpError
+import time
+import traceback
+
+from datetime import datetime
+import sys
+
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.entity import Entity
 import logging
-from pyVim.connect import SmartConnect, SmartConnectNoSSL
-from pyVmomi import vim, vmodl  # pylint: disable=no-name-in-module
 
-from .const import SUPPORTED_PRODUCTS
+#from .const import SUPPORTED_PRODUCTS   ## Partial class import - why?
 
 _LOGGER = logging.getLogger(__name__)
+
+def get(target, oids, credentials, port=161, engine=hlapi.SnmpEngine(), context=hlapi.ContextData()):
+    handler = hlapi.getCmd(engine, credentials, hlapi.UdpTransportTarget((target, port)), context, *__class__.construct_object_types(oids))
+    return __class__.fetch(handler, 1)[0]
+    
+def construct_object_types(list_of_oids):
+    object_types = []
+    for oid in list_of_oids:
+        object_types.append(hlapi.ObjectType(hlapi.ObjectIdentity(oid)))
+    return object_types
+
+def get_bulk(target, oids, credentials, count, start_from=0, port=161,
+            engine=hlapi.SnmpEngine(), context=hlapi.ContextData()):
+
+    handler = hlapi.bulkCmd(engine, credentials, hlapi.UdpTransportTarget((target, port)), context, start_from, count, *__class__.construct_object_types(oids))
+    return __class__.fetch(handler, count)
+
+def get_bulk_auto(target, oids, credentials, count_oid, start_from=0, port=161, engine=hlapi.SnmpEngine(), context=hlapi.ContextData()):
+    count = __class__.get(target, [count_oid], credentials, port, engine, context)[count_oid]
+    return __class__.get_bulk(target, oids, credentials, count, start_from, port, engine, context)
+
+def cast(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            try:
+                return str(value)
+            except (ValueError, TypeError):
+                pass
+    return value
+
+def fetch(handler, count):
+    result = []
+    for i in range(count):
+        try:
+            error_indication, error_status, error_index, var_binds = next(handler)
+            if not error_indication and not error_status:
+                items = {}
+                for var_bind in var_binds:
+                    items[str(var_bind[0])] = __class__.cast(var_bind[1])
+                result.append(items)
+            else:
+                raise RuntimeError('Got SNMP error: {0}'.format(error_indication))
+        except StopIteration:
+            break
+    return result
 
 
 def esx_connect(host, user, pwd, port, ssl):
