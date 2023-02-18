@@ -1,5 +1,5 @@
-"""Constants for ESXi Stats."""
-DOMAIN = "esxi_stats"
+"""Constants for FortiGate Stats."""
+DOMAIN = "fortigate_stats"
 DOMAIN_DATA = "{}_data".format(DOMAIN)
 
 PLATFORMS = ["sensor"]
