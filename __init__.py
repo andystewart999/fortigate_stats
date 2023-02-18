@@ -4,19 +4,28 @@ import logging
 import os
 from datetime import datetime, timedelta
 
-from .esxi import (
-    esx_connect,
-    esx_disconnect,
-    check_license,
-    get_host_info,
-    get_datastore_info,
-    get_license_info,
-    get_vm_info,
-    vm_pwr,
-    vm_snap_take,
-    vm_snap_remove,
+#from .esxi import (
+#    esx_connect,
+#    esx_disconnect,
+#    check_license,
+#    get_host_info,
+#    get_datastore_info,
+#    get_license_info,
+#    get_vm_info,
+#    vm_pwr,
+#    vm_snap_take,
+#    vm_snap_remove,
+#)
+
+from .snmp import (
+    construct_object_types,
+    get,
+    get_bulk,
+    get_bulk_auto,
+    cast,
+    fetch,
 )
-from pyVmomi import vim  # pylint: disable=no-name-in-module
+
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -26,46 +35,39 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (
     CONF_HOST,
     CONF_USERNAME,
-    CONF_PASSWORD,
     CONF_PORT,
-    CONF_VERIFY_SSL,
     # CONF_MONITORED_CONDITIONS,
-    __version__ as HAVERSION,
+    __version__ as HAVERSION,    #check what this is for?
 )
 from homeassistant.util import Throttle
 from .const import (
-    AVAILABLE_CMND_VM_SNAP,
-    AVAILABLE_CMND_VM_POWER,
-    COMMAND,
     DEFAULT_OPTIONS,
     DOMAIN,
     DOMAIN_DATA,
     PLATFORMS,
     REQUIRED_FILES,
-    HOST,
-    VM,
 )
 
 _LOGGER = logging.getLogger(__name__)
-MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=45)
+MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=60)
 
-VM_PWR_SCHEMA = vol.Schema(
-    {
-        vol.Required(HOST): cv.string,
-        vol.Required(VM): cv.string,
-        vol.Required(COMMAND): cv.string,
-    }
-)
-SNAP_CREATE_SCHEMA = vol.Schema(
-    {vol.Required(HOST): cv.string, vol.Required(VM): cv.string}, extra=vol.ALLOW_EXTRA
-)
-SNAP_REMOVE_SCHEMA = vol.Schema(
-    {
-        vol.Required(HOST): cv.string,
-        vol.Required(VM): cv.string,
-        vol.Required(COMMAND): cv.string,
-    }
-)
+#VM_PWR_SCHEMA = vol.Schema(
+#    {
+#        vol.Required(HOST): cv.string,
+#        vol.Required(VM): cv.string,
+#        vol.Required(COMMAND): cv.string,
+#    }
+#)
+#SNAP_CREATE_SCHEMA = vol.Schema(
+#    {vol.Required(HOST): cv.string, vol.Required(VM): cv.string}, extra=vol.ALLOW_EXTRA
+#)
+#SNAP_REMOVE_SCHEMA = vol.Schema(
+#    {
+#        vol.Required(HOST): cv.string,
+#        vol.Required(VM): cv.string,
+#        vol.Required(COMMAND): cv.string,
+#    }
+#)
 CONFIG_SCHEMA = vol.Schema(
     {DOMAIN: vol.Schema({}, extra=vol.ALLOW_EXTRA)}, extra=vol.ALLOW_EXTRA
 )
@@ -103,22 +105,18 @@ async def async_setup_entry(hass, config_entry):
         hass.data[DOMAIN_DATA] = {}
     hass.data[DOMAIN_DATA][entry] = {}
     hass.data[DOMAIN_DATA][entry]["configuration"] = "config_flow"
-    hass.data[DOMAIN_DATA][entry]["vmhost"] = {}
-    hass.data[DOMAIN_DATA][entry]["datastore"] = {}
-    hass.data[DOMAIN_DATA][entry]["license"] = {}
-    hass.data[DOMAIN_DATA][entry]["vm"] = {}
-    hass.data[DOMAIN_DATA][entry]["monitored_conditions"] = []
+    hass.data[DOMAIN_DATA][entry]["estimated_bandwidth"] = {}
+    hass.data[DOMAIN_DATA][entry]["resource_usage"] = {}
+    hass.data[DOMAIN_DATA][entry]["session_information"] = {}
+    hass.data[DOMAIN_DATA][entry]["monitored_sources"] = []
 
-    if config_entry.data["vmhost"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_conditions"].append("vmhost")
-    if config_entry.data["datastore"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_conditions"].append("datastore")
-    if config_entry.data["license"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_conditions"].append("license")
-
-    if config_entry.data["vm"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_conditions"].append("vm")
-
+    if config_entry.data["resource_usage"]:
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("resource_usage")
+    if config_entry.data["session_information"]:
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("session_information")
+    if config_entry.data["estimated_bandwidth"]:
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("estimated_bandwidth")
+        
     if not config_entry.options:
         async_update_options(hass, config_entry)
 
@@ -171,7 +169,7 @@ def connect(hass, config, entry):
     return lic
 
 
-class esxiStats:
+class snmpStats:
     """This class handles communication, services, and stores the data."""
 
     def __init__(self, hass, config, config_entry=None):
@@ -180,9 +178,7 @@ class esxiStats:
         self.config = config[DOMAIN]
         self.host = config[DOMAIN].get(CONF_HOST)
         self.user = config[DOMAIN].get(CONF_USERNAME)
-        self.passwd = config[DOMAIN].get(CONF_PASSWORD)
         self.port = config[DOMAIN].get(CONF_PORT)
-        self.ssl = config[DOMAIN].get(CONF_VERIFY_SSL)
         self.entry = config_entry.entry_id
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
