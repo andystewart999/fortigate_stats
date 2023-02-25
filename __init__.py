@@ -123,23 +123,12 @@ async def async_setup_entry(hass, config_entry):
 
     # get global config
     _LOGGER.debug("Setting up host %s", config[DOMAIN].get(CONF_HOST))
-    hass.data[DOMAIN_DATA][entry]["client"] = esxiStats(hass, config, config_entry)
-
-    lic = await hass.async_add_executor_job(connect, hass, config, entry)
+    hass.data[DOMAIN_DATA][entry]["client"] = snmpStats(hass, config, config_entry)
 
     # load platforms
     for platform in PLATFORMS:
         hass.async_add_job(
             hass.config_entries.async_forward_entry_setup(config_entry, platform)
-        )
-
-    # if lisense allows API write, register services
-    if lic:
-        async_add_services(hass)
-    else:
-        _LOGGER.info(
-            "Service calls are disabled - %s doesn't have a supported license",
-            config[DOMAIN]["host"],
         )
 
     return True
@@ -151,9 +140,7 @@ def connect(hass, config, entry):
         conn_details = {
             "host": config[DOMAIN]["host"],
             "user": config[DOMAIN]["username"],
-            "pwd": config[DOMAIN]["password"],
             "port": config[DOMAIN]["port"],
-            "ssl": config[DOMAIN]["verify_ssl"],
         }
         conn = esx_connect(**conn_details)
         _LOGGER.debug("Product Line: %s", conn.content.about.productLineId)
@@ -200,7 +187,17 @@ class snmpStats:
             _LOGGER.error("ERROR: %s", error)
         else:
             # get all stats
-            if self.config.get("") is True:
+            if self.config.get("resource_usage") is True:
+                # Get CPU and RAM resource usage info
+                # CPU
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
+                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.3.0"),
+                    lookupMib = False,
+                )
+                
+                
+                
                 # create/distroy view objects
                 host_objview = content.viewManager.CreateContainerView(
                     content.rootFolder, [vim.HostSystem], True
