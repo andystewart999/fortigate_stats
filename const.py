@@ -90,7 +90,7 @@ SNMP_MAP = {
     "1.3.6.1.4.1.12356.101.4.9.2.1.9": "SD-WAN health check packet loss",
     "1.3.6.1.4.1.12356.101.4.9.2.1.11": "SD-WAN health check inbound bandwidth (estimated)",
     "1.3.6.1.4.1.12356.101.4.9.2.1.12": "SD-WAN health check outbound bandwidth (estimated)",
-    "1.3.6.1.4.1.12356.101.4.9.2.1.14": "SD-WAN health check interface name".
+    "1.3.6.1.4.1.12356.101.4.9.2.1.14": "SD-WAN health check interface name"
 }
 
 SUPPORTED_PRODUCTS = ["FortiGate", "FortiGate"]
