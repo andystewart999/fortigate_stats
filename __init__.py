@@ -240,10 +240,9 @@ class snmpStats:
 
                 currentcpu = 1
                 sessioncount = 0
-                while currentcpu < cpucount
+                while currentcpu < cpucount;
                     errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),y
-                        
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),                        
                     cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.5.3.1.8." + str(currentcpu),
                     lookupMib = False,
                     )
