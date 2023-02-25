@@ -10,20 +10,8 @@ from homeassistant.core import callback
 # from homeassistant.helpers import aiohttp_client
 
 from .const import (
-    CONF_DS_STATE,
-    CONF_HOST_STATE,
-    CONF_LIC_STATE,
-    CONF_VM_STATE,
     DOMAIN,
     DEFAULT_PORT,
-    DEFAULT_DS_STATE,
-    DEFAULT_HOST_STATE,
-    DEFAULT_LIC_STATE,
-    DEFAULT_VM_STATE,
-    DATASTORE_STATES,
-    LICENSE_STATES,
-    VMHOST_STATES,
-    VM_STATES
 )
 from .esxi import esx_connect, esx_disconnect
 
@@ -65,9 +53,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
                 self._test_communication,
                 user_input["host"],
                 user_input["port"],
-                user_input["verify_ssl"],
                 user_input["username"],
-                user_input["password"],
             )
             if valid:
                 return self.async_create_entry(
@@ -86,12 +72,6 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
         host = ""
         port = DEFAULT_PORT
         username = ""
-        password = ""
-        verify_ssl = False
-        vmhost = True
-        datastore = True
-        license = True
-        vm = True
 
         if user_input is not None:
             if "host" in user_input:
@@ -100,29 +80,13 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
                 port = user_input["port"]
             if "username" in user_input:
                 username = user_input["username"]
-            if "password" in user_input:
-                password = user_input["password"]
-            if "verify_ssl" in user_input:
-                verify_ssl = user_input["verify_ssl"]
-            if "vmhost" in user_input:
-                vmhost = user_input["vmhost"]
-            if "datastore" in user_input:
-                datastore = user_input["datastore"]
-            if "license" in user_input:
-                license = user_input["license"]
-            if "vm" in user_input:
-                vm = user_input["vm"]
-
+ #           if "datastore" in user_input:
+ #               datastore = user_input["datastore"]
+ 
         data_schema = OrderedDict()
         data_schema[vol.Required("host", default=host)] = str
         data_schema[vol.Required("port", default=port)] = int
         data_schema[vol.Required("username", default=username)] = str
-        data_schema[vol.Required("password", default=password)] = str
-        data_schema[vol.Optional("verify_ssl", default=verify_ssl)] = bool
-        data_schema[vol.Optional("vmhost", default=vmhost)] = bool
-        data_schema[vol.Optional("datastore", default=datastore)] = bool
-        data_schema[vol.Optional("license", default=license)] = bool
-        data_schema[vol.Optional("vm", default=vm)] = bool
         return self.async_show_form(
             step_id="user", data_schema=vol.Schema(data_schema), errors=self._errors
         )
@@ -156,55 +120,56 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
             return False
 
 
-class ESXiStatsOptionsFlow(config_entries.OptionsFlow):
-    """Handle ESXi Stats options"""
+class SNMPStatsOptionsFlow(config_entries.OptionsFlow):
+    """Handle FortiGate Stats options"""
 
     def __init__(self, config_entry):
-        """Initialize ESXi Stats options flow."""
+        """Initialize FortiGate Stats options flow."""
         self.config_entry = config_entry
         self.options = dict(config_entry.options)
 
     async def async_step_init(self, user_input=None):
-        """Manage ESXi Stats options."""
+        """Manage FortiGate Stats options."""
         return await self.async_step_esxi_options()
 
-    async def async_step_esxi_options(self, user_input=None):
-        """Manage ESXi Stats Options."""
-        if user_input is not None:
-            self.options[CONF_HOST_STATE] = user_input[CONF_HOST_STATE]
-            self.options[CONF_DS_STATE] = user_input[CONF_DS_STATE]
-            self.options[CONF_LIC_STATE] = user_input[CONF_LIC_STATE]
-            self.options[CONF_VM_STATE] = user_input[CONF_VM_STATE]
-            return self.async_create_entry(title="", data=self.options)
-
-        return self.async_show_form(
-            step_id="esxi_options",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(
-                        CONF_HOST_STATE,
-                        default=self.config_entry.options.get(
-                            CONF_HOST_STATE, DEFAULT_HOST_STATE
-                        ),
-                    ): vol.In(VMHOST_STATES),
-                    vol.Optional(
-                        CONF_DS_STATE,
-                        default=self.config_entry.options.get(
-                            CONF_DS_STATE, DEFAULT_DS_STATE
-                        ),
-                    ): vol.In(DATASTORE_STATES),
-                    vol.Optional(
-                        CONF_LIC_STATE,
-                        default=self.config_entry.options.get(
-                            CONF_LIC_STATE, DEFAULT_LIC_STATE
-                        ),
-                    ): vol.In(LICENSE_STATES),
-                    vol.Optional(
-                        CONF_VM_STATE,
-                        default=self.config_entry.options.get(
-                            CONF_VM_STATE, DEFAULT_VM_STATE
-                        ),
-                    ): vol.In(VM_STATES),
-                }
-            ),
-        )
+#    async def async_step_esxi_options(self, user_input=None):
+#        """Manage FortiGate Stats Options."""
+#        if user_input is not None:
+#            self.options[CONF_HOST_STATE] = user_input[CONF_HOST_STATE]
+#            self.options[CONF_DS_STATE] = user_input[CONF_DS_STATE]
+#            self.options[CONF_LIC_STATE] = user_input[CONF_LIC_STATE]
+#            self.options[CONF_VM_STATE] = user_input[CONF_VM_STATE]
+#            return self.async_create_entry(title="", data=self.options)
+#
+#        return self.async_show_form(
+#            step_id="snmp_options",
+#            data_schema=vol.Schema(
+#                {
+#                    vol.Optional(
+#                        CONF_HOST_STATE,
+#                        default=self.config_entry.options.get(
+#                            CONF_HOST_STATE, DEFAULT_HOST_STATE
+#                        ),
+#                    ): vol.In(VMHOST_STATES),
+#                    vol.Optional(
+#                        CONF_DS_STATE,
+#                        default=self.config_entry.options.get(
+#                            CONF_DS_STATE, DEFAULT_DS_STATE
+#                        ),
+#                    ): vol.In(DATASTORE_STATES),
+#                    vol.Optional(
+#                        CONF_LIC_STATE,
+#                        default=self.config_entry.options.get(
+#                            CONF_LIC_STATE, DEFAULT_LIC_STATE
+#                        ),
+#                    ): vol.In(LICENSE_STATES),
+#                    vol.Optional(
+#                        CONF_VM_STATE,
+#                        default=self.config_entry.options.get(
+#                            CONF_VM_STATE, DEFAULT_VM_STATE
+#                        ),
+#                    ): vol.In(VM_STATES),
+#                }
+#            ),
+#        )
+#
