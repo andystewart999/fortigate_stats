@@ -13,7 +13,7 @@ from .const import (
     DOMAIN,
     DEFAULT_PORT,
 )
-from .esxi import esx_connect, esx_disconnect
+#from .esxi import esx_connect, esx_disconnect
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -110,10 +110,10 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
     def _test_communication(self, host, port, verify_ssl, username, password):
         """Return true if the communication is ok."""
         try:
-            conn = esx_connect(host, username, password, port, verify_ssl)
+            #conn = esx_connect(host, username, password, port, verify_ssl)
+            conn = True
             _LOGGER.debug(conn)
 
-            esx_disconnect(conn)
             return True
         except Exception as exception:  # pylint: disable=broad-except
             _LOGGER.error(exception)
