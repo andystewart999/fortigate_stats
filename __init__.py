@@ -18,14 +18,14 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 #    vm_snap_remove,
 #)
 
-from .snmp import (
-    construct_object_types,
-    get,
-    get_bulk,
-    get_bulk_auto,
-    cast,
-    fetch,
-)
+#from .snmp import (
+#    construct_object_types,
+#    get,
+#    get_bulk,
+#    get_bulk_auto,
+#    cast,
+#    fetch,
+#)
 
 import voluptuous as vol
 
@@ -134,27 +134,25 @@ async def async_setup_entry(hass, config_entry):
     return True
 
 
-def connect(hass, config, entry):
-    """Connect."""
-    try:
-        conn_details = {
-            "host": config[DOMAIN]["host"],
-            "user": config[DOMAIN]["username"],
-            "port": config[DOMAIN]["port"],
-        }
-        conn = esx_connect(**conn_details)
-        _LOGGER.debug("Product Line: %s", conn.content.about.productLineId)
-
-        # get license type and objects
-        lic = check_license(conn.RetrieveContent().licenseManager)
-        hass.data[DOMAIN_DATA][entry]["client"].update_data()
-    except Exception as exception:  # pylint: disable=broad-except
-        _LOGGER.error(exception)
-        raise ConfigEntryNotReady
-    finally:
-        esx_disconnect(conn)
-
-    return lic
+#def connect(hass, config, entry):
+#    """Connect."""
+#    try:
+#        conn_details = {f
+#            "host": config[DOMAIN]["host"],
+#            "user": config[DOMAIN]["username"],
+#            "port": config[DOMAIN]["port"],
+#        }
+#        conn = esx_connect(**conn_details)  ## What's happening here?
+#        _LOGGER.debug("Product Line: %s", conn.content.about.productLineId)#
+#
+#        hass.data[DOMAIN_DATA][entry]["client"].update_data()
+#    except Exception as exception:  # pylint: disable=broad-except
+#        _LOGGER.error(exception)
+#        raise ConfigEntryNotReady
+#    finally:
+#        ##esx_disconnect(conn)
+#
+#    return lic
 
 
 class snmpStats:
