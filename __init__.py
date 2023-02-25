@@ -178,11 +178,16 @@ class snmpStats:
             cmdGen = cmdGen.CommandGenerator()
             errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
                 auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                cmdGen.MibVariable("1.3.6.1.2.1.1.5.0"),  
+                cmdGen.MibVariable("1.3.6.1.4.1.12356.100.1.1.1"),  
                 lookupMib = False,
             )
+            
+            for val in varBinds:
+                    self.hass.data[DOMAIN_DATA][self.entry]["serialnunber"] = val
+                    
         except Exception as error:
-            _LOGG all stats
+             _LOGGER.error("ERROR: %s", error)
+        else:    
             if self.config.get("resource_usage") is True:
                 # Get CPU and RAM resource usage info
                 # CPU
