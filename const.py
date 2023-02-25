@@ -75,7 +75,7 @@ DEFAULT_PORT = 161
 #    "used_space_gb"
 #]
 
-SNMP_MAP = {
+SNMP_MAP = [
     "1.3.6.1.4.1.12356.101.4.1.1.0": "FortiOS version",
     "1.3.6.1.4.1.12356.101.4.1.3.0": "CPU usage (%)",
     "1.3.6.1.4.1.12356.101.4.1.4.0": "Memory usage (%)",
@@ -91,6 +91,6 @@ SNMP_MAP = {
     "1.3.6.1.4.1.12356.101.4.9.2.1.11": "SD-WAN health check inbound bandwidth (estimated)",
     "1.3.6.1.4.1.12356.101.4.9.2.1.12": "SD-WAN health check outbound bandwidth (estimated)",
     "1.3.6.1.4.1.12356.101.4.9.2.1.14": "SD-WAN health check interface name".
-}
+]
 
 SUPPORTED_PRODUCTS = ["FortiGate", "FortiGate"]
