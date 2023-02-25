@@ -9,7 +9,6 @@ from .const import (
     DOMAIN_DATA,
     DEFAULT_NAME,
     DEFAULT_OPTIONS,
-    MAP_TO_MEASUREMENT,
 )
 
 SCAN_INTERVAL = timedelta(seconds=15)
@@ -69,7 +68,7 @@ class snnmpSensor(Entity):
             )
         else:
             self._state = self._data[self._options[self._cond]]
-            self._measurement = measureFormat(self._options[self._cond])
+            #self._measurement = measureFormat(self._options[self._cond])
 
         # Set attributes
         for key, value in self._data.items():
@@ -121,9 +120,9 @@ class snnmpSensor(Entity):
         }
 
 
-def measureFormat(input):
-    """Return measurement in readable form."""
-    if input in MAP_TO_MEASUREMENT.keys():
-        return MAP_TO_MEASUREMENT[input]
-    else:
-        return capwords(input.replace("_", " "))
+#def measureFormat(input):
+#    """Return measurement in readable form."""
+#    if input in MAP_TO_MEASUREMENT.keys():
+#        return MAP_TO_MEASUREMENT[input]
+#    else:
+#        return capwords(input.replace("_", " "))
