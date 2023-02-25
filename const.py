@@ -5,7 +5,6 @@ DOMAIN_DATA = "{}_data".format(DOMAIN)
 PLATFORMS = ["sensor"]
 REQUIRED_FILES = [
     "const.py",
-    "snmp.py",
     "manifest.json",
     "sensor.py",
     "config_flow.py",
