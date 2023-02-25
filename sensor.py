@@ -1,4 +1,4 @@
-"""Sensor platform for esxi_stats."""
+"""Sensor platform for fortigate_stats."""
 import logging
 from string import capwords
 from datetime import timedelta
@@ -23,7 +23,7 @@ async def async_setup_platform(
     """Set up sensor platform."""
     for cond in hass.data[DOMAIN_DATA]["monitored_conditions"]:
         for obj in hass.data[DOMAIN_DATA][cond]:
-            async_add_entities([esxiSensor(hass, discovery_info, cond, obj)], True)
+            async_add_entities([snmpSensor(hass, discovery_info, cond, obj)], True)
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
@@ -32,11 +32,11 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     entry_id = config_entry.entry_id
     for cond in hass.data[DOMAIN_DATA][entry_id]["monitored_conditions"]:
         for obj in hass.data[DOMAIN_DATA][entry_id][cond]:
-            async_add_devices([esxiSensor(hass, config, cond, obj, config_entry)], True)
+            async_add_devices([snmpSensor(hass, config, cond, obj, config_entry)], True)
 
 
-class esxiSensor(Entity):
-    """ESXi_stats Sensor class."""
+class snnmpSensor(Entity):
+    """FortiGate_stats Sensor class."""
 
     def __init__(self, hass, config, cond, obj, config_entry=None):
         """Init."""
@@ -79,7 +79,7 @@ class esxiSensor(Entity):
     def unique_id(self):
         """Return a unique ID to use for this sensor."""
         return "{}_{}_{}_{}".format(
-            self.config["host"].replace(".", "_"), self._entry_id, self._cond, self._obj
+            self.config["serialnumber"].replace(".", "_"), self._entry_id, self._cond, self._obj
         )
 
     @property
@@ -111,7 +111,7 @@ class esxiSensor(Entity):
     def device_info(self):
         """Return device info for this sensor."""
         if self._config_entry is None:
-            indentifier = {(DOMAIN, self.config["host"].replace(".", "_"))}
+            indentifier = {(DOMAIN, self.config["serialnumber"].replace(".", "_"))}
         else:
             indentifier = {(DOMAIN, self._config_entry.entry_id)}
         return {
