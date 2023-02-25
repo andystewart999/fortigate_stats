@@ -3,6 +3,7 @@ import asyncio
 import logging
 import os
 from datetime import datetime, timedelta
+from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 #from .esxi import (
 #    esx_connect,
@@ -184,16 +185,22 @@ class snmpStats:
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update_data(self):
         """Update data."""
-        conn = None
+        auth = None
+        cmdGen = None
         try:
             # connect and get data from host
-            conn = esx_connect(self.host, self.user, self.passwd, self.port, self.ssl)
-            content = conn.RetrieveContent()
+            auth = cmdGen.CommunityData(self.user) ## More error trapping here!
+            cmdGen = cmdGen.CommandGenerator()
+            errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                auth, cmdGen.UdpTransportTarget((self.host, self.port)),
+                cmdGen.MibVariable("1.3.6.1.2.1.1.5.0"),
+                lookupMib = False,
+            )
         except Exception as error:
             _LOGGER.error("ERROR: %s", error)
         else:
-            # get host stats
-            if self.config.get("vmhost") is True:
+            # get all stats
+            if self.config.get("") is True:
                 # create/distroy view objects
                 host_objview = content.viewManager.CreateContainerView(
                     content.rootFolder, [vim.HostSystem], True
