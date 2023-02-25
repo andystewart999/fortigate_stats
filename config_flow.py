@@ -128,10 +128,10 @@ class SNMPStatsOptionsFlow(config_entries.OptionsFlow):
         self.config_entry = config_entry
         self.options = dict(config_entry.options)
 
-    async def async_step_init(self, user_input=None):
-        """Manage FortiGate Stats options."""
-        return await self.async_step_esxi_options()
-
+#    async def async_step_init(self, user_input=None):
+#        """Manage FortiGate Stats options."""
+#        return await self.async_step_esxi_options()
+#
 #    async def async_step_esxi_options(self, user_input=None):
 #        """Manage FortiGate Stats Options."""
 #        if user_input is not None:
