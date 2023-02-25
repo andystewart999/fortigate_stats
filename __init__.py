@@ -1,4 +1,4 @@
-"""ESXi Stats Integration."""
+"""FortiGate Stats Integration."""
 import asyncio
 import logging
 import os
