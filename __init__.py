@@ -180,13 +180,11 @@ class snmpStats:
             cmdGen = cmdGen.CommandGenerator()
             errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
                 auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                cmdGen.MibVariable("1.3.6.1.2.1.1.5.0"),
+                cmdGen.MibVariable("1.3.6.1.2.1.1.5.0"),  
                 lookupMib = False,
             )
         except Exception as error:
-            _LOGGER.error("ERROR: %s", error)
-        else:
-            # get all stats
+            _LOGG all stats
             if self.config.get("resource_usage") is True:
                 # Get CPU and RAM resource usage info
                 # CPU
@@ -195,79 +193,89 @@ class snmpStats:
                     cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.3.0"),
                     lookupMib = False,
                 )
-                
-                
-                
-                # create/distroy view objects
-                host_objview = content.viewManager.CreateContainerView(
-                    content.rootFolder, [vim.HostSystem], True
+                for val in varBinds:
+                    self.hass.data[DOMAIN_DATA][self.entry]["cpuusage"] = val
+                    
+                # RAM
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
+                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.4.0"),
+                    lookupMib = False,
                 )
-                esxi_hosts = host_objview.view
-                host_objview.Destroy()
-
-                # Look through object list and get data
-                _LOGGER.debug("Found %s host(s)", len(esxi_hosts))
-                for esxi_host in esxi_hosts:
-                    host_name = esxi_host.summary.config.name.replace(" ", "_").lower()
-
-                    _LOGGER.debug("Getting stats for vmhost: %s", host_name)
-                    self.hass.data[DOMAIN_DATA][self.entry]["vmhost"][
-                        host_name
-                    ] = get_host_info(esxi_host)
-
-            # get datastore stats
-            if self.config.get("datastore") is True:
-                # create/distroy view objects
-                ds_objview = content.viewManager.CreateContainerView(
-                    content.rootFolder, [vim.Datastore], True
+                for val in varBinds:
+                    self.hass.data[DOMAIN_DATA][self.entry]["ramusage"] = val
+                    
+                # Disk
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
+                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.7.0"),
+                    lookupMib = False,
                 )
-                ds_list = ds_objview.view
-                ds_objview.Destroy()
-
-                # Look through object list and get data
-                _LOGGER.debug("Found %s datastore(s)", len(ds_list))
-                for ds in ds_list:
-                    ds_name = ds.summary.name.replace(" ", "_").lower()
-
-                    _LOGGER.debug("Getting stats for datastore: %s", ds_name)
-                    self.hass.data[DOMAIN_DATA][self.entry]["datastore"][
-                        ds_name
-                    ] = get_datastore_info(ds)
-
-            # get license stats
-            if self.config.get("license") is True:
-                lic_list = content.licenseManager
-                _count = 1
-
-                _LOGGER.debug("Found %s license(s)", len(lic_list.licenses))
-                for lic in lic_list.licenses:
-                    _LOGGER.debug("Getting stats for licenses")
-                    self.hass.data[DOMAIN_DATA][self.entry]["license"][
-                        _count
-                    ] = get_license_info(lic, self.host)
-                    _count += 1
-
-            # get vm stats
-            if self.config.get("vm") is True:
-                # create/distroy view objects
-                vm_objview = content.viewManager.CreateContainerView(
-                    content.rootFolder, [vim.VirtualMachine], True
+                for val in varBinds:
+                    diskcapacity = val
+                    
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
+                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.6.0"),
+                    lookupMib = False,
                 )
-                vm_list = vm_objview.view
-                vm_objview.Destroy()
+                for val in varBinds:
+                    diskusage = val
 
-                # Look through object list and get data
-                _LOGGER.debug("Found %s VM(s)", len(vm_list))
-                for vm in vm_list:
-                    vm_name = vm.summary.config.name.replace(" ", "_").lower()
+               self.hass.data[DOMAIN_DATA][self.entry]["diskusage"] = diskusage / diskcapacity
+              
+                
+            if self.config.get("session_information") is True:
+                # Get session info
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
+                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.5.2.0"),
+                    lookupMib = False,
+                )
+                for val in varBinds:
+                    cpucount = val
 
-                    _LOGGER.debug("Getting stats for vm: %s", vm_name)
-                    self.hass.data[DOMAIN_DATA][self.entry]["vm"][
-                        vm_name
-                    ] = get_vm_info(vm)
+                currentcpu = 1
+                sessioncount = 0
+                while currentcpu < cpucount
+                    errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),y
+                        
+                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.5.3.1.8." + str(currentcpu),
+                    lookupMib = False,
+                    )
+
+                    for val in varBinds:
+                        sessioncount += val
+        
+                    currentcpu += 1
+       
+                self.hass.data[DOMAIN_DATA][self.entry]["sessioncount"] = sessioncount
+                
+                        
+            if self.config.get("estimated_bandwidth") is True:
+                # Get the estimated link bandwidth
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
+                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.9.2.1.11.1"),
+                    lookupMib = False,
+                )
+                for val in varBinds:
+                    self.hass.data[DOMAIN_DATA][self.entry]["estimatedinboundbandwidth"] = val
+                        
+                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
+                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.9.2.1.12.1"),
+                    lookupMib = False,
+                )
+                for val in varBinds:
+                    self.hass.data[DOMAIN_DATA][self.entry]["estimatedoutboundbandwidth"] = val
+
         finally:
             if conn is not None:
-                esx_disconnect(conn)
+                varBinds = None
+                cmdGen = None
+                auth = None
 
 
 def check_files(hass):
@@ -288,96 +296,6 @@ def check_files(hass):
     return returnvalue
 
 
-@callback
-def async_add_services(hass):
-    """Add ESXi Stats services."""
-    # Check that a host exists in HomeAssistant and get its credentials
-    @callback
-    def async_get_conn_details(host):
-        for _entry in hass.config_entries.async_entries(DOMAIN):
-            if host == _entry.data.get("host"):
-                return {
-                    "host": _entry.data.get("host"),
-                    "user": _entry.data.get("username"),
-                    "pwd": _entry.data.get("password"),
-                    "port": _entry.data.get("port"),
-                    "ssl": _entry.data.get("verify_ssl"),
-                }
-            else:
-                continue
-
-        raise ValueError("Host is not configured in HomeAssistant")
-
-    # VM power service
-    async def vm_power(call):
-        host = call.data["host"]
-        vm = call.data["vm"]
-        cmnd = call.data["command"]
-
-        if cmnd in AVAILABLE_CMND_VM_POWER:
-            try:
-                conn_details = async_get_conn_details(host)
-                await hass.async_add_executor_job(
-                    vm_pwr, hass, host, vm, cmnd, conn_details
-                )
-            except Exception as e:
-                _LOGGER.error(str(e))
-        else:
-            _LOGGER.error("vm_power: '%s' is not a supported command", cmnd)
-
-    # Snapshot create service
-    async def snap_create(call):
-        host = call.data["host"]
-        vm = call.data["vm"]
-        memory = False
-        quiesce = False
-        now = datetime.now()
-        desc = "Taken from HASS (" + HAVERSION + ") on " + now.strftime("%x %X")
-
-        if "name" in call.data:
-            name = call.data["name"]
-
-        if "description" in call.data:
-            desc = call.data["description"]
-        if "memory" in call.data:
-            memory = call.data["memory"]
-        if "quiesce" in call.data:
-            quiesce = call.data["quiesce"]
-
-        try:
-            conn_details = async_get_conn_details(host)
-            hass.async_add_executor_job(
-                vm_snap_take, hass, host, vm, name, desc, memory, quiesce, conn_details
-            )
-        except Exception as e:
-            _LOGGER.error(str(e))
-
-    # Snapshot remove service
-    async def snap_remove(call):
-        host = call.data["host"]
-        vm = call.data["vm"]
-        cmnd = call.data["command"]
-
-        if cmnd in AVAILABLE_CMND_VM_SNAP:
-            try:
-                conn_details = async_get_conn_details(host)
-                hass.async_add_executor_job(
-                    vm_snap_remove, hass, host, vm, cmnd, conn_details
-                )
-            except Exception as e:
-                _LOGGER.error(str(e))
-        else:
-            _LOGGER.error("snap_remove: '%s' is not a supported command", cmnd)
-
-    hass.services.async_register(DOMAIN, "vm_power", vm_power, schema=VM_PWR_SCHEMA)
-    hass.services.async_register(
-        DOMAIN, "create_snapshot", snap_create, schema=SNAP_CREATE_SCHEMA
-    )
-    hass.services.async_register(
-        DOMAIN, "remove_snapshot", snap_remove, schema=SNAP_REMOVE_SCHEMA
-    )
-
-
 async def async_unload_entry(hass, config_entry):
     """Handle removal of an entry."""
     if hass.data.get(DOMAIN_DATA, {}).get("configuration") == "yaml":
@@ -393,7 +311,7 @@ async def async_unload_entry(hass, config_entry):
                 for platform in PLATFORMS
             ]
         )
-        _LOGGER.info("Successfully removed the ESXi Stats integration")
+        _LOGGER.info("Successfully removed the FortiGate Stats integration")
 
     return True
 
