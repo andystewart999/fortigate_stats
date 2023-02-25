@@ -225,7 +225,7 @@ class snmpStats:
                 for val in varBinds:
                     diskusage = val
 
-               self.hass.data[DOMAIN_DATA][self.entry]["diskusage"] = diskusage / diskcapacity
+                self.hass.data[DOMAIN_DATA][self.entry]["diskusage"] = diskusage / diskcapacity
               
                 
             if self.config.get("session_information") is True:
