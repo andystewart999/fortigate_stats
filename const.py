@@ -37,12 +37,11 @@ DEFAULT_PORT = 161
 #DEFAULT_VM_STATE = "state"
 
 ## used to set default states for yaml config.
-#DEFAULT_OPTIONS = {
-#    "datastore": "free_space_gb",
-#    "vmhost": "vms",
-#    "license": "status",
-#    "vm": "state"
-#}
+DEFAULT_OPTIONS = {
+    "resource_usage": True,
+    "session_information": True,
+    "estimated_bandwidth": True
+}
 
 #DATASTORE_STATES = [
 #    "connected_hosts",
