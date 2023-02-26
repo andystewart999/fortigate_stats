@@ -25,3 +25,5 @@ Health check packet loss  .1.3.6.1.4.1.12356.101.4.9.2.1.9[.1]            .iso.o
 Health check b/w inbound  .1.3.6.1.4.1.12356.101.4.9.2.1.11[.1]           .iso.org.dod.internet.private.enterprises.fortinet.fnFortiGateMib.fgSystem.fgVWLHealthCheckLink.fgVWLHealthCheckLinkTable.fgVWLHealthCheckLinkTableEntry.fgVWLHealthCheckLinkBandwidthIn[.1]
 Health check b/w outbound .1.3.6.1.4.1.12356.101.4.9.2.1.12[.1]           .iso.org.dod.internet.private.enterprises.fortinet.fnFortiGateMib.fgSystem.fgVWLHealthCheckLink.fgVWLHealthCheckLinkTable.fgVWLHealthCheckLinkTableEntry.fgVWLHealthCheckLinkBandwidthOut[.1]
 Health check interface    .1.3.6.1.4.1.12356.101.4.9.2.1.14[.1]           .iso.org.dod.internet.private.enterprises.fortinet.fnFortiGateMib.fgSystem.fgVWLHealthCheckLink.fgVWLHealthCheckLinkTable.fgVWLHealthCheckLinkTableEntry.fgVWLHealthCheckLinkIfName[.1]
+
+https://www.yaklin.ca/2021/08/25/snmp-queries-with-python.html
