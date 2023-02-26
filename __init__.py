@@ -106,9 +106,9 @@ async def async_setup_entry(hass, config_entry):
         hass.data[DOMAIN_DATA] = {}
     hass.data[DOMAIN_DATA][entry] = {}
     hass.data[DOMAIN_DATA][entry]["configuration"] = "config_flow"
-    hass.data[DOMAIN_DATA][entry]["estimated_bandwidth"] = {}
-    hass.data[DOMAIN_DATA][entry]["resource_usage"] = {}
-    hass.data[DOMAIN_DATA][entry]["session_information"] = {}
+    hass.data[DOMAIN_DATA][entry]["estimated_bandwidth"] = True #Temporary hard-coding
+    hass.data[DOMAIN_DATA][entry]["resource_usage"] = True #Temporary hard-coding
+    hass.data[DOMAIN_DATA][entry]["session_information"] = True #Temporary hard-coding
     hass.data[DOMAIN_DATA][entry]["monitored_sources"] = []
 
     if config_entry.data["resource_usage"]:
