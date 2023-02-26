@@ -107,7 +107,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
             if host == entry.data.get("host"):
                 return True
 
-    def _test_communication(self, host, port, verify_ssl, username, password):
+    def _test_communication(self, host, port, username):
         """Return true if the communication is ok."""
         try:
             #conn = esx_connect(host, username, password, port, verify_ssl)
