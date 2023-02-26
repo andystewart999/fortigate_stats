@@ -40,7 +40,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     async_add_devices([snmpSensor(hass, config, cond, obj, config_entry)], True)
 
 
-class snnmpSensor(Entity):
+class snmpSensor(Entity):
     """FortiGate_stats Sensor class."""
 
     def __init__(self, hass, config, cond, obj, config_entry=None):
