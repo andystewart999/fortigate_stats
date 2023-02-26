@@ -17,7 +17,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_platform(
-    hass, config, async_add_entities, discovery_info=None
+    hass, config, async_add_entities, discovery_info=Nesxone
 ):  # pylint: disable=unused-argument
     """Set up sensor platform."""
     for cond in hass.data[DOMAIN_DATA]["monitored_conditions"]:
@@ -115,8 +115,8 @@ class snnmpSensor(Entity):
             indentifier = {(DOMAIN, self._config_entry.entry_id)}
         return {
             "identifiers": indentifier,
-            "name": "ESXi Stats",
-            "manufacturer": "VMware, Inc.",
+            "name": "FortiGate stats",
+            "manufacturer": "Fortinet",
         }
 
 
