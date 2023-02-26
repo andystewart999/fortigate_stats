@@ -30,7 +30,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
-        return ESXiStatsOptionsFlow(config_entry)
+        return SNMPStatsOptionsFlow(config_entry)
 
     def __init__(self):
         """Initialize."""
