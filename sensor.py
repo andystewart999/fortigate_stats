@@ -20,9 +20,12 @@ async def async_setup_platform(
     hass, config, async_add_entities, discovery_info=None
 ):  # pylint: disable=unused-argument
     """Set up sensor platform."""
-    for cond in hass.data[DOMAIN_DATA]["monitored_conditions"]:
-        for obj in hass.data[DOMAIN_DATA][cond]:
-            async_add_entities([snmpSensor(hass, discovery_info, cond, obj)], True)
+#    for cond in hass.data[DOMAIN_DATA]["monitored_conditions"]:
+#        for obj in hass.data[DOMAIN_DATA][cond]:
+#            async_add_entities([snmpSensor(hass, discovery_info, cond, obj)], True)
+      cond = None
+      obj = None
+      async_add_entities([snmpSensor(hass, discovery_info, cond, obj)], True)
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
