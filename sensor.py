@@ -32,9 +32,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up sensor platform."""
     config = config_entry.data
     entry_id = config_entry.entry_id
-    for cond in hass.data[DOMAIN_DATA][entry_id]["monitored_conditions"]:
-        for obj in hass.data[DOMAIN_DATA][entry_id][cond]:
-            async_add_devices([snmpSensor(hass, config, cond, obj, config_entry)], True)
+#    for cond in hass.data[DOMAIN_DATA][entry_id]["monitored_conditions"]:
+#        for obj in hass.data[DOMAIN_DATA][entry_id][cond]:
+#            async_add_devices([snmpSensor(hass, config, cond, obj, config_entry)], True)
+    cond = None
+    obj = None
+    async_add_devices([snmpSensor(hass, config, cond, obj, config_entry)], True)
 
 
 class snnmpSensor(Entity):
