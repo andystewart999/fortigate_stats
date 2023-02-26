@@ -111,12 +111,17 @@ async def async_setup_entry(hass, config_entry):
     hass.data[DOMAIN_DATA][entry]["session_information"] = True #Temporary hard-coding
     hass.data[DOMAIN_DATA][entry]["monitored_sources"] = []
 
-    if config_entry.data["resource_usage"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("resource_usage")
-    if config_entry.data["session_information"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("session_information")
-    if config_entry.data["estimated_bandwidth"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("estimated_bandwidth")
+#    if config_entry.data["resource_usage"]:
+#        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("resource_usage")
+#    if config_entry.data["session_information"]:
+#        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("session_information")
+#    if config_entry.data["estimated_bandwidth"]:
+#        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("estimated_bandwidth")
+#        
+    hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("resource_usage")
+    hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("session_information")
+    hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("estimated_bandwidth")
+
         
     if not config_entry.options:
         async_update_options(hass, config_entry)
