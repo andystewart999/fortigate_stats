@@ -95,7 +95,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
         data_schema[vol.Required("monitor_sdwan_interfaces", default=True)] = bool
        
         return self.async_show_form(
-            step_id="user", data_schema=vol.Schema(data_schema), errors=self._errors
+            step_id="user1", data_schema=vol.Schema(data_schema), errors=self._errors
         )
 
     async def async_step_import(self, user_input):
