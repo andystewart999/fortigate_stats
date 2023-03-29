@@ -4,29 +4,31 @@
             "single_instance_allowed": "Only a single instance of this integration is supported."
         },
         "error": {
-            "connection_error": "Es kann keine Verbindung zum SNMP-Service hergestellt werden.",
-            "identifier_exists": "Das Konto ist bereits registriert.",
-            "invalid_credentials": "Ung\u00fcltige Anmeldeinformationen"
+            "connection_error": "Connection error.",
+            "identifier_exists": "Identifier exists. (?)",
+            "invalid_credentials": "Thing\u00fcMore thing"
         },
         "step": {
-            "user": {
+            "user1": {
                 "data": {
-                    "password": "Passwort",
-                    "username": "Nutzername(user/installer)",
-                    "ip_address": "IP-Adresse",
-                    "scan_interval": "Aktualisierungsinterval(Sekunden)"
+                    "host": "Name or IP address",
+                    "username": "Community string",
+                    "port": "SNMP port",
+                    "monitor_cpu_ram": "Monitor CPU and RAM",
+					"monitor_disk_usage": "Monitor disk usage",
+                    "monitor_session_count": "Monitor session count",
+					"monitor_sdwan_interfaces": "Monitor SD-WAN interfaces"
                 },
-                "title": "Gib deine SNMP-Anmeldeinformationen ein"
+                "title": "FortiGate stats"
             }
-            
         },
-        "title": "SNMP Stats"
+        "title": "FortiGate stats"
     },
     "options":{
         "step":{
             "init":{
                 "data":{
-                    "scan_interval": "Aktualisierungsinterval(Sekunden)"
+                    "scan_interval": "Scan interval (seconds)"
                 }
             }
         }

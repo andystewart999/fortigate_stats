@@ -13,7 +13,8 @@ from .const import (
     DOMAIN,
     DEFAULT_PORT,
 )
-#from .esxi import esx_connect, esx_disconnect
+from .snmp import snmp_get
+from .snmp import snmp_getmulti
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
         """Initialize."""
         self._errors = {}
 
-    async def async_step_user(self, user_input={}):
+    async def async_step_user1(self, user_input={}):
         """Handle a flow initialized by the user."""
         self._errors = {}
         if self.hass.data.get(DOMAIN):
@@ -49,15 +50,16 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
                 return self.async_abort(reason="already_configured")
 
             # If it is not, continue with communication test
-            valid = await self.hass.async_add_executor_job(
+            valid, hostname = await self.hass.async_add_executor_job(
                 self._test_communication,
                 user_input["host"],
                 user_input["port"],
                 user_input["username"],
             )
             if valid:
+                # Need to turn hostname into something Home Assistant is OK with
                 return self.async_create_entry(
-                    title=user_input["host"], data=user_input
+                    title=hostname, data=user_input
                 )
             else:
                 self._errors["base"] = "communication"
@@ -74,8 +76,8 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
         username = ""
 
         if user_input is not None:
-            if "host" in user_input:
-                host = user_input["host"]
+            if "hostname" in user_input:
+                host = user_input["hostname"]
             if "port" in user_input:
                 port = user_input["port"]
             if "username" in user_input:
@@ -84,11 +86,16 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
  #               datastore = user_input["datastore"]
  
         data_schema = OrderedDict()
-        data_schema[vol.Required("host", default=host)] = str
+        data_schema[vol.Required("host", default="10.0.0.1")] = str
+        data_schema[vol.Required("username", default="admin")] = str
         data_schema[vol.Required("port", default=port)] = int
-        data_schema[vol.Required("username", default=username)] = str
+        data_schema[vol.Required("monitor_cpu_ram", default=True)] = bool
+        data_schema[vol.Required("monitor_disk_usage", default=True)] = bool
+        data_schema[vol.Required("monitor_session_count", default=True)] = bool
+        data_schema[vol.Required("monitor_sdwan_interfaces", default=True)] = bool
+       
         return self.async_show_form(
-            step_id="user", data_schema=vol.Schema(data_schema), errors=self._errors
+            step_id="user1", data_schema=vol.Schema(data_schema), errors=self._errors
         )
 
     async def async_step_import(self, user_input):
@@ -110,11 +117,23 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
     def _test_communication(self, host, port, username):
         """Return true if the communication is ok."""
         try:
-            #conn = esx_connect(host, username, password, port, verify_ssl)
-            conn = True
-            _LOGGER.debug(conn)
+            conn = False
+            hostname = ''
+            oid = '1.3.6.1.2.1.1.5.0'
+            hostname = snmp_get(host, username, port, oid)
+            _LOGGER.error (hostname)
+#            oids = (oid,)
+#            _LOGGER.error ("calling snmp_getmulti")
+#            varBinds = snmp_getmulti(host, username, port, oids)
+#            for oid, val in varBinds:
+#                hostname = val
+#            hostname = varBinds[0][1]
+#            _LOGGER.error(hostname)
+            if (hostname != ""):
+                conn = True
+            _LOGGER.error(conn)
 
-            return True
+            return conn, "fortigate100d"
         except Exception as exception:  # pylint: disable=broad-except
             _LOGGER.error(exception)
             return False

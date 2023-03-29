@@ -3,7 +3,6 @@ import asyncio
 import logging
 import os
 from datetime import datetime, timedelta
-from pysnmp.entity.rfc3413.oneliner import cmdgen
 
 #from .esxi import (
 #    esx_connect,
@@ -18,15 +17,7 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 #    vm_snap_remove,
 #)
 
-#from .snmp import (
-#    construct_object_types,
-#    get,
-#    get_bulk,
-#    get_bulk_auto,
-#    cast,
-#    fetch,
-#)
-
+from .snmp import snmp_get
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -37,10 +28,11 @@ from homeassistant.const import (
     CONF_HOST,
     CONF_USERNAME,
     CONF_PORT,
-    # CONF_MONITORED_CONDITIONS,
+    CONF_MONITORED_CONDITIONS,
     __version__ as HAVERSION,    #check what this is for?
 )
 from homeassistant.util import Throttle
+
 from .const import (
     DEFAULT_OPTIONS,
     DOMAIN,
@@ -175,20 +167,9 @@ class snmpStats:
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update_data(self):
         """Update data."""
-        auth = None
-        cmdGen = None
         try:
             # connect and get data from host
-            auth = cmdGen.CommunityData(self.user) ## More error trapping here!
-            cmdGen = cmdGen.CommandGenerator()
-            errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                cmdGen.MibVariable("1.3.6.1.4.1.12356.100.1.1.1"),  
-                lookupMib = False,
-            )
-            
-            for val in varBinds:
-                    self.hass.data[DOMAIN_DATA][self.entry]["serialnunber"] = val
+            self.hass.data[DOMAIN_DATA][self.entry]["serialnunber"] = snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.100.1.1.1.0")
                     
         except Exception as error:
              _LOGGER.error("ERROR: %s", error)
@@ -196,65 +177,26 @@ class snmpStats:
             if self.config.get("resource_usage") is True:
                 # Get CPU and RAM resource usage info
                 # CPU
-                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.3.0"),
-                    lookupMib = False,
-                )
-                for val in varBinds:
-                    self.hass.data[DOMAIN_DATA][self.entry]["cpuusage"] = val
+                self.hass.data[DOMAIN_DATA][self.entry]["cpuusage"] = snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.101.4.1.3.0")
                     
                 # RAM
-                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.4.0"),
-                    lookupMib = False,
-                )
-                for val in varBinds:
-                    self.hass.data[DOMAIN_DATA][self.entry]["ramusage"] = val
-                    
-                # Disk
-                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.7.0"),
-                    lookupMib = False,
-                )
-                for val in varBinds:
-                    diskcapacity = val
-                    
-                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.1.6.0"),
-                    lookupMib = False,
-                )
-                for val in varBinds:
-                    diskusage = val
+                self.hass.data[DOMAIN_DATA][self.entry]["ramusage"] = snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.101.4.1.4.0")
 
-                self.hass.data[DOMAIN_DATA][self.entry]["diskusage"] = diskusage / diskcapacity
+                # Disk
+                diskcapacity = snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.101.4.1.7.0")
+                diskusage = snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.101.4.1.6.0")
+
+                self.hass.data[DOMAIN_DATA][self.entry]["diskusage"] = (diskusage / diskcapacity) * 100
               
                 
             if self.config.get("session_information") is True:
                 # Get session info
-                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.5.2.0"),
-                    lookupMib = False,
-                )
-                for val in varBinds:
-                    cpucount = val
+                cpucount = snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.101.4.5.2.0")
 
                 currentcpu = 1
                 sessioncount = 0
                 while currentcpu < cpucount:
-                    errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),                        
-                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.5.3.1.8." + str(currentcpu)),
-                    lookupMib = False,
-                    )
-
-                    for val in varBinds:
-                        sessioncount += val
-        
+                    sessioncount += snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.101.4.5.3.1.8." + str(currentcpu))
                     currentcpu += 1
        
                 self.hass.data[DOMAIN_DATA][self.entry]["sessioncount"] = sessioncount
@@ -262,27 +204,8 @@ class snmpStats:
                         
             if self.config.get("estimated_bandwidth") is True:
                 # Get the estimated link bandwidth
-                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.9.2.1.11.1"),
-                    lookupMib = False,
-                )
-                for val in varBinds:
-                    self.hass.data[DOMAIN_DATA][self.entry]["estimatedinboundbandwidth"] = val
-                        
-                errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
-                    auth, cmdGen.UdpTransportTarget((self.host, self.port)),
-                    cmdGen.MibVariable("1.3.6.1.4.1.12356.101.4.9.2.1.12.1"),
-                    lookupMib = False,
-                )
-                for val in varBinds:
-                    self.hass.data[DOMAIN_DATA][self.entry]["estimatedoutboundbandwidth"] = val
-
-        finally:
-            if conn is not None:
-                varBinds = None
-                cmdGen = None
-                auth = None
+                self.hass.data[DOMAIN_DATA][self.entry]["estimatedinboundbandwidth"] = snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.101.4.9.2.1.11.1")
+                self.hass.data[DOMAIN_DATA][self.entry]["estimatedoutboundbandwidth"] = snmp_get (self.host, self.user, self.port, "1.3.6.1.4.1.12356.101.4.9.2.1.12.1")
 
 
 def check_files(hass):

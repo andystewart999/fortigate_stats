@@ -75,11 +75,12 @@ DEFAULT_OPTIONS = {
 #]
 
 SNMP_MAP = {
+    "1.3.6.1.2.1.1.5.0": "Host name",
     "1.3.6.1.4.1.12356.101.4.1.1.0": "FortiOS version",
     "1.3.6.1.4.1.12356.101.4.1.3.0": "CPU usage (%)",
     "1.3.6.1.4.1.12356.101.4.1.4.0": "Memory usage (%)",
     "1.3.6.1.4.1.12356.101.4.1.6.0": "Disk usage (MB)",
-    "1.3.6.1.4.1.12356.101.4.1.7.0": "Disk capacity (MB)", # We need both of these to get a percentage, SNMP won't return it directly
+    "1.3.6.1.4.1.12356.101.4.1.7.0": "Disk capacity (MB)", # We need both usage and capacity to get a percentage, SNMP won't return it directly
     "1.3.6.1.4.1.12356.101.4.5.2.0": "Processor module count",
     "1.3.6.1.4.1.12356.101.4.5.3.1.8": "Sessions", # Append with .1, ,2 etc depending on the processor module count, then sum all the values
     "1.3.6.1.4.1.12356.101.4.9.1.0": "SD-WAN health check count",
