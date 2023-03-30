@@ -17,7 +17,7 @@
                     "monitor_cpu_ram": "Monitor CPU and RAM",
 					"monitor_disk_usage": "Monitor disk usage",
                     "monitor_session_count": "Monitor session count",
-					"monitor_sdwan_interfaces": "Monitor SD-WAN interfaces"
+					"monitor_sdwan_interfaces": "Monitor performance SLAs"
                 },
                 "title": "FortiGate stats"
             }

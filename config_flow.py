@@ -57,7 +57,8 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
                 user_input["username"],
             )
             if valid:
-                # Need to turn hostname into something Home Assistant is OK with
+                # Do we need to turn hostname into something Home Assistant is OK with?
+                # Or just leave this as a cosmetic thing, with the serial number being the uniqueness?
                 return self.async_create_entry(
                     title=hostname, data=user_input
                 )
@@ -133,7 +134,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
                 conn = True
             _LOGGER.error(conn)
 
-            return conn, "fortigate100d"
+            return conn, hostname
         except Exception as exception:  # pylint: disable=broad-except
             _LOGGER.error(exception)
             return False
