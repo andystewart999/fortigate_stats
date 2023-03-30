@@ -9,7 +9,7 @@
             "invalid_credentials": "Thing\u00fcMore thing"
         },
         "step": {
-            "user1": {
+            "user": {
                 "data": {
                     "host": "Name or IP address",
                     "username": "Community string",
