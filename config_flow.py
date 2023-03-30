@@ -37,7 +37,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
         """Initialize."""
         self._errors = {}
 
-    async def async_step_user(self, user_input={}):
+    async def async_step_user1(self, user_input={}):
         """Handle a flow initialized by the user."""
         self._errors = {}
         if self.hass.data.get(DOMAIN):
