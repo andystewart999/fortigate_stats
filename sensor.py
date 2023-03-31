@@ -20,26 +20,26 @@ async def async_setup_platform(
     hass, config, async_add_entities, discovery_info=None
 ):  # pylint: disable=unused-argument
     """Set up sensor platform."""
-    for cond in hass.data[DOMAIN_DATA]["monitored_conditions"]:
+    for source in hass.data[DOMAIN_DATA]["monitored_sources"]:
 #        for obj in# hass.data[DOMAIN_DATA][cond]:
 #            async_#add_entities([snmpSensor(hass, discovery_info, cond, obj)], True)
-        async_add_entities([snmpSensor(hass, discovery_info, cond)], True)
+        async_add_entities([snmpSensor(hass, discovery_info, source)], True)
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up sensor platform."""
     config = config_entry.data
     entry_id = config_entry.entry_id
-    for cond in hass.data[DOMAIN_DATA][entry_id]["monitored_conditions"]:
+    for source in hass.data[DOMAIN_DATA][entry_id]["monitored_sources"]:
     #    for obj in hass.data[DOMAIN_DATA][entry_id][cond]:
     #        async_add_devices([snmpSensor(hass, config, cond, obj, config_entry)], True)
-        async_add_devices([snmpSensor(hass, config, cond, config_entry)], True)
+        async_add_devices([snmpSensor(hass, config, source, config_entry)], True)
 
 
 class snmpSensor(Entity):
     """FortiGate_stats Sensor class."""
 
-    def __init__(self, hass, config, cond, config_entry=None):
+    def __init__(self, hass, config, source, config_entry=None):
         """Init."""
         self.hass = hass
         self._attr = {}
@@ -53,23 +53,23 @@ class snmpSensor(Entity):
             self._options = self._config_entry.options
         else:
             self._options = DEFAULT_OPTIONS
-        self._cond = cond
+        self._source = source
 
     def update(self):
         """Update the sensor."""
         self.hass.data[DOMAIN_DATA][self._entry_id]["client"].update_data()
-        self._data = self.hass.data[DOMAIN_DATA][self._entry_id][self._cond]
+        self._data = self.hass.data[DOMAIN_DATA][self._entry_id][self._source]
 
         # Set state and measurement
-        if self._options[self._cond] not in self._data.keys():
+        if self._options[self._source] not in self._data.keys():
             self._state = "Error"
             self._measurement = ""
             _LOGGER.error(
                 "State is set to incorrect key. Check Options in Integration UI"
             )
         else:
-            self._state = self._data[self._options[self._cond]]
-            self._measurement = measureFormat(self._options[self._cond])
+            self._state = self._data[self._options[self._source]]
+            self._measurement = measureFormat(self._options[self._source])
 
         # Set attributes
         for key, value in self._data.items():
@@ -79,7 +79,7 @@ class snmpSensor(Entity):
     def unique_id(self):
         """Return a unique ID to use for this sensor."""
         return "{}_{}_{}_{}".format(
-            self.config["serialnumber"].replace(".", "_"), self._entry_id, self._cond
+            self.config["serialnumber"].replace(".", "_"), self._entry_id, self._source
         )
 
     @property
@@ -90,7 +90,7 @@ class snmpSensor(Entity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return "{} {} {}".format(DEFAULT_NAME, self._cond)
+        return "{} {} {}".format(DEFAULT_NAME, self._source)
 
     @property
     def state(self):
