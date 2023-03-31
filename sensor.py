@@ -23,6 +23,7 @@ async def async_setup_platform(
     for source in hass.data[DOMAIN_DATA]["monitored_sources"]:
 #        for obj in# hass.data[DOMAIN_DATA][cond]:
 #            async_#add_entities([snmpSensor(hass, discovery_info, cond, obj)], True)
+        _LOGGER.error(source)
         async_add_entities([snmpSensor(hass, discovery_info, source)], True)
 
 
@@ -68,9 +69,9 @@ class snmpSensor(Entity):
 #                "State is set to incorrect key. Check Options in Integration UI"
 #            )
 #        else:
-        self._state = self._data[self._options[self._source]]
+        #self._state = self._data[self._options[self._source]]
  #      self._measurement = measureFormat(self._options[self._source])
-        self._measurement = "test"
+        #self._measurement = "test"
 
         # Set attributes
         for key, value in self._data.items():

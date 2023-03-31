@@ -98,23 +98,21 @@ async def async_setup_entry(hass, config_entry):
         hass.data[DOMAIN_DATA] = {}
     hass.data[DOMAIN_DATA][entry] = {}
     hass.data[DOMAIN_DATA][entry]["configuration"] = "config_flow"
-    hass.data[DOMAIN_DATA][entry]["estimated_bandwidth"] = True #Temporary hard-coding
-    hass.data[DOMAIN_DATA][entry]["resource_usage"] = True #Temporary hard-coding
-    hass.data[DOMAIN_DATA][entry]["session_information"] = True #Temporary hard-coding
+    hass.data[DOMAIN_DATA][entry]["monitor_sdwan_interfaces"] = True #Temporary hard-coding
+    hass.data[DOMAIN_DATA][entry]["monitor_session_count"] = True #Temporary hard-coding
+    hass.data[DOMAIN_DATA][entry]["monitor_disk_usage"] = True #Temporary hard-coding
+    hass.data[DOMAIN_DATA][entry]["monitor_cpu_ram"] = True #Temporary hard-coding
     hass.data[DOMAIN_DATA][entry]["monitored_sources"] = []
 
-#    if config_entry.data["resource_usage"]:
-#        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("resource_usage")
-#    if config_entry.data["session_information"]:
-#        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("session_information")
-#    if config_entry.data["estimated_bandwidth"]:
-#        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("estimated_bandwidth")
-#        
-    hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("resource_usage")
-    hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("session_information")
-    hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("estimated_bandwidth")
-
-        
+    if config_entry.data["monitor_sdwan_interfaces"]:
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("sdwan_interfaces")
+    if config_entry.data["monitor_session_count"]:
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("session_count")
+    if config_entry.data["monitor_disk_usage"]:
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("disk_usage")
+    if config_entry.data["monitor_cpu_ram"]:
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("cpu_ram")
+     
     if not config_entry.options:
         async_update_options(hass, config_entry)
 

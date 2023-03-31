@@ -122,7 +122,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
             hostname = ''
             oid = '1.3.6.1.2.1.1.5.0'
             hostname = snmp_get(host, username, port, oid)
-            _LOGGER.error (hostname)
+#            _LOGGER.error (hostname)
 #            oids = (oid,)
 #            _LOGGER.error ("calling snmp_getmulti")
 #            varBinds = snmp_getmulti(host, username, port, oids)
@@ -132,7 +132,7 @@ class ESXIiStatslowHandler(config_entries.ConfigFlow):
 #            _LOGGER.error(hostname)
             if (hostname != ""):
                 conn = True
-            _LOGGER.error(conn)
+#            _LOGGER.error(conn)
 
             return conn, hostname
         except Exception as exception:  # pylint: disable=broad-except
