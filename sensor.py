@@ -69,7 +69,7 @@ class snmpSensor(Entity):
 #            )
 #        else:
         self._state = self._data[self._options[self._source]]
- #        self._measurement = measureFormat(self._options[self._source])
+ #      self._measurement = measureFormat(self._options[self._source])
         self._measurement = "test"
 
         # Set attributes
