@@ -68,9 +68,9 @@ class snmpSensor(Entity):
 #                "State is set to incorrect key. Check Options in Integration UI"
 #            )
 #        else:
-         self._state = self._data[self._options[self._source]]
+        self._state = self._data[self._options[self._source]]
  #        self._measurement = measureFormat(self._options[self._source])
-         self._measurement = "test"
+        self._measurement = "test"
 
         # Set attributes
         for key, value in self._data.items():
