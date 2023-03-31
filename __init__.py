@@ -105,13 +105,13 @@ async def async_setup_entry(hass, config_entry):
     hass.data[DOMAIN_DATA][entry]["monitored_sources"] = []
 
     if config_entry.data["monitor_sdwan_interfaces"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("sdwan_interfaces")
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("monitor_sdwan_interfaces")
     if config_entry.data["monitor_session_count"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("session_count")
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("monitor_session_count")
     if config_entry.data["monitor_disk_usage"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("disk_usage")
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("monitor_disk_usage")
     if config_entry.data["monitor_cpu_ram"]:
-        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("cpu_ram")
+        hass.data[DOMAIN_DATA][entry]["monitored_sources"].append("monitor_cpu_ram")
      
     if not config_entry.options:
         async_update_options(hass, config_entry)
