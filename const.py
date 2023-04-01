@@ -18,6 +18,9 @@ CONFIG_SCHEMA_A=vol.Schema(
                 vol.Required(CONF_USERNAME): str),
                 #vol.Required(CONF_PASSWORD): str,
                 vol.Required(CONF_IP_ADDRESS): str,
+                vol.Optional("cpu_and_ram"): bool,
+                vol.Optional("disk"): bool,
+                vol.Optional("sessions"): bool,
             }
 )
 

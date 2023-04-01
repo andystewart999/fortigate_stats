@@ -13,7 +13,10 @@
                 "data": {
                     "username": "Community string",
                     "ip_address": "IP address",
-                    "scan_interval": "Scan interval (seconds)"
+                    "scan_interval": "Scan interval (seconds)",
+					"cpu_and_ram": "Monitor CPU and RAM usage",
+					"disk": "Monitor disk usage",
+					"sessions": "Monitor session count"
                 },
                 "title": "Enter firewall details"
             }
