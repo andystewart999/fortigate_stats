@@ -1,28 +1,26 @@
 {
     "config": {
         "abort": {
-            "single_instance_allowed": "Only a single instance of this integration is supported."
+            "single_instance_allowed": "Only a single instance of this integration can be added."
         },
         "error": {
-            "connection_error": "Connection error.",
-            "identifier_exists": "Identifier exists. (?)",
-            "invalid_credentials": "Thing\u00fcMore thing"
+            "connection_error": "Unable to connect via SNMP.",
+            "identifier_exists": "The identifier already exists.",
+            "invalid_credentials": "Invalid credentials"
         },
         "step": {
             "user": {
                 "data": {
-                    "host": "Name or IP address",
+                    "password": "Password",
                     "username": "Community string",
-                    "port": "SNMP port",
-                    "monitor_cpu_ram": "Monitor CPU and RAM",
-					"monitor_disk_usage": "Monitor disk usage",
-                    "monitor_session_count": "Monitor session count",
-					"monitor_sdwan_interfaces": "Monitor performance SLAs"
+                    "ip_address": "IP address",
+                    "scan_interval": "Scan interval (seconds)"
                 },
-                "title": "FortiGate stats"
+                "title": "Enter firewall details"
             }
+            
         },
-        "title": "FortiGate stats"
+        "title": "Fortigate stats"
     },
     "options":{
         "step":{

@@ -1,0 +1,10 @@
+{
+    "domain": "fortigate_stats",
+    "name": "fortigate_stats",
+    "documentation": "https://github.com/andystewart999/fortigate_stats",
+    "dependencies": [],
+    "codeowners": ["@andystewart999"],
+    "requirements": ["pysnmp"],
+    "config_flow": true,
+    "version": "0.1.4"
+}

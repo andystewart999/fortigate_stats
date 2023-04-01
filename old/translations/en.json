@@ -1,0 +1,36 @@
+{
+    "config": {
+        "abort": {
+            "single_instance_allowed": "Only a single instance of this integration is supported."
+        },
+        "error": {
+            "connection_error": "Connection error.",
+            "identifier_exists": "Identifier exists. (?)",
+            "invalid_credentials": "Thing\u00fcMore thing"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "host": "Name or IP address",
+                    "username": "Community string",
+                    "port": "SNMP port",
+                    "monitor_cpu_ram": "Monitor CPU and RAM",
+					"monitor_disk_usage": "Monitor disk usage",
+                    "monitor_session_count": "Monitor session count",
+					"monitor_sdwan_interfaces": "Monitor performance SLAs"
+                },
+                "title": "FortiGate stats"
+            }
+        },
+        "title": "FortiGate stats"
+    },
+    "options":{
+        "step":{
+            "init":{
+                "data":{
+                    "scan_interval": "Scan interval (seconds)"
+                }
+            }
+        }
+    }
+}
