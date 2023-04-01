@@ -114,7 +114,7 @@ class SnmpStatisticsMonitor:
         self.username=username
         self.target_ip=target_ip
         self.hostname=None
-        self.serialnumber=none
+        self.serialnumber=None
         self.include_cpu_and_ram = False
         self.cpu_usage=None
         self.ram_usage=None
@@ -203,7 +203,7 @@ class SnmpStatisticsMonitor:
             '1.3.6.1.4.1.12356.101.4.1.4.0'
             ],hlapi.CommunityData(self.username))
         
-        
+            #hostname, serialnumber, cpu usage, ram usage    
         #cpu usage://1.3.6.1.2.1.25.3.3[.1...4]
         #cpu_usages= __class__.get_bulk(self.target_ip, [
         #    '1.3.6.1.2.1.25.3.3',
@@ -219,8 +219,8 @@ class SnmpStatisticsMonitor:
         #    print(f"{k}:{v}")
         self.hostname=more_data['1.3.6.1.2.1.1.5.0']
         self.serialnumber=more_data['1.3.6.1.4.1.12356.100.1.1.1.0']
-        self.cpu_usage=more_data['1.3.6.1.4.1.2021.10.1.3.1']
-        self.ram_usage=more_data['1.3.6.1.4.1.2021.10.1.3.2']
+        self.cpu_usage=more_data['1.3.6.1.4.1.12356.101.4.1.3.0']
+        self.ram_usage=more_data['1.3.6.1.4.1.12356.101.4.1.4.0']
         #self.cpuload3=more_data['1.3.6.1.4.1.2021.10.1.3.3']
 
     def update_netif_stats(self):
