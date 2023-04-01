@@ -36,6 +36,8 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         self.include_disk = user_input["disk"]
         self.include_sessions = user_input["sessions"]
         
+        LOGGER.error(self)
+        
         try:
             SnmpStatisticsMonitor(username, ipaddress)
             
