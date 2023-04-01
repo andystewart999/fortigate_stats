@@ -94,7 +94,7 @@ class SnmpStatisticsSensor(Entity):
     def state(self):
         """Return the state of the device."""
         return self._state
-    @property
+    @propertyas
     def name(self):
         """Return the name of the sensor."""
         return self._name
