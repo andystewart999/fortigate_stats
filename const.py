@@ -15,7 +15,7 @@ DEFAULT_SCAN_INTERVAL = 10
 
 CONFIG_SCHEMA_A=vol.Schema(
             {
-                #vol.Required(CONF_USERNAME): vol.In(["User", "Installer"]),
+                vol.Required(CONF_USERNAME): str),
                 #vol.Required(CONF_PASSWORD): str,
                 vol.Required(CONF_IP_ADDRESS): str,
             }
