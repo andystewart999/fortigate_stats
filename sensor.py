@@ -94,7 +94,7 @@ class SnmpStatisticsSensor(Entity):
     def state(self):
         """Return the state of the device."""
         return self._state
-    @propertyas
+    @property
     def name(self):
         """Return the name of the sensor."""
         return self._name
@@ -344,7 +344,7 @@ class SnmpStatisticsMonitor:
     def _AddOrUpdateEntity(self,id,friendlyname,value,unit):
         if id in self.meterSensors:
             sensor=self.meterSensors[id]
-            sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname})
+            sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname,"other_thing":"othertest"})
             sensor.set_state(value)
         else:
             sensor=SnmpStatisticsSensor(id,friendlyname)
@@ -352,7 +352,8 @@ class SnmpStatisticsMonitor:
             sensor.set_attributes(
                     {
                         "unit_of_measurement":unit,
-                        "friendly_name":friendlyname
+                        "friendly_name":friendlyname,
+                        "made_up_thing":"test"
                     }
                 )
             self.async_add_entities([sensor])
@@ -393,7 +394,9 @@ class SnmpStatisticsMonitor:
 
 
         self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpu_usage,'%')
-        self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage,'%')
+        
+        if self.include_sessions:
+            self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage,'%')
         #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
         
 
