@@ -343,12 +343,17 @@ class SnmpStatisticsMonitor:
     
     def _AddOrUpdateEntity(self,id,friendlyname,value,unit):
         if id in self.meterSensors:
+            LOGGER.error("id is in list")
             sensor=self.meterSensors[id]
-            sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname,"other_thing":"othertest"})
+            #LOGGER.error("setting attributes 1")
+            #sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname,"other_thing":"othertest"})
+            LOGGER.error("updating state")
             sensor.set_state(value)
         else:
+            LOGGER.error("id is not in list")
             sensor=SnmpStatisticsSensor(id,friendlyname)
             sensor._state=value
+            LOGGER.error("setting attributes 2")
             sensor.set_attributes(
                     {
                         "unit_of_measurement":unit,
@@ -356,6 +361,7 @@ class SnmpStatisticsMonitor:
                         "made_up_thing":"test"
                     }
                 )
+            LOGGER.error("adding entity")
             self.async_add_entities([sensor])
             #time.sleep(.5)#sleep a moment and wait for async add
             self.meterSensors[id]=sensor
