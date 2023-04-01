@@ -217,7 +217,7 @@ class SnmpStatisticsMonitor:
         #print(more_data['1.3.6.1.2.1.1.5.0'])
         #for k,v in more_data:
         #    print(f"{k}:{v}")
-        self.hostname=more_data['1.3.6.1.2.1.1.5.0']
+        self.hostname=more_data['1.3.6.1.2.1.1.5.0']                    #don't need to update these two every time
         self.serialnumber=more_data['1.3.6.1.4.1.12356.100.1.1.1.0']
         self.cpu_usage=more_data['1.3.6.1.4.1.12356.101.4.1.3.0']
         self.ram_usage=more_data['1.3.6.1.4.1.12356.101.4.1.4.0']
@@ -344,7 +344,7 @@ class SnmpStatisticsMonitor:
     def _AddOrUpdateEntity(self,id,friendlyname,value,unit):
         if id in self.meterSensors:
             sensor=self.meterSensors[id]
-            #sensor.set_attributes({"unit_of_measurement":unit,"device_class":"power","friendly_name":friendlyname})
+            sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname})
             sensor.set_state(value)
         else:
             sensor=SnmpStatisticsSensor(id,friendlyname)
@@ -352,7 +352,6 @@ class SnmpStatisticsMonitor:
             sensor.set_attributes(
                     {
                         "unit_of_measurement":unit,
-                        #"device_class":"power",
                         "friendly_name":friendlyname
                     }
                 )
@@ -393,8 +392,8 @@ class SnmpStatisticsMonitor:
 
 
 
-        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpu_usage * 100,'%')
-        self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage * 100,'%')
+        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpu_usage,'%')
+        self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage,'%')
         #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
         
 
