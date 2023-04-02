@@ -6,7 +6,8 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_USERNAME,
     CONF_IP_ADDRESS,
-    CONF_SCAN_INTERVAL
+    CONF_SCAN_INTERVAL,
+    CONF_PORT
 )
 LOGGER = logging.getLogger(__package__)
 
@@ -17,7 +18,7 @@ CONFIG_SCHEMA_A=vol.Schema(
             {
                 vol.Required(CONF_USERNAME): str,
                 vol.Required(CONF_IP_ADDRESS): str,
-                vol.Optional(DEFAULT_PORT, default=161): int,
+                vol.Optional(CONF_PORT, default=161): int,
                 vol.Required("cpu_and_ram"): bool,
                 vol.Required("disk"): bool,
                 vol.Required("sessions"): bool,

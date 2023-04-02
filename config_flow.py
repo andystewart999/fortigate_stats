@@ -15,7 +15,7 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_IP_ADDRESS,
     CONF_SCAN_INTERVAL,
-    DEFAULT_PORT
+    CONF_PORT
 )
 
 
@@ -34,7 +34,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         username = user_input[CONF_USERNAME]
         #password = user_input[CONF_PASSWORD]
         ipaddress= user_input[CONF_IP_ADDRESS]
-        port= user_input[DEFAULT_PORT]
+        port= user_input[CONF_PORT]
         
         LOGGER.error (user_input[CONF_USERNAME])
         LOGGER.error (user_input["cpu_and_ram"])

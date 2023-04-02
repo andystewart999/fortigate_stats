@@ -20,7 +20,7 @@ from homeassistant.const import (
     CONF_IP_ADDRESS,
     EVENT_HOMEASSISTANT_STOP, 
     CONF_SCAN_INTERVAL,
-    DEFAULT_PORT
+    CONF_PORT
 )
 
 
