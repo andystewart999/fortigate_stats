@@ -20,6 +20,7 @@ from homeassistant.const import (
     CONF_IP_ADDRESS,
     EVENT_HOMEASSISTANT_STOP, 
     CONF_SCAN_INTERVAL,
+    DEFAULT_PORT
 )
 
 
@@ -121,21 +122,13 @@ class SnmpStatisticsMonitor:
         self.current_if_data={}
         self.current_if_data_time=0
         self.stat_time=0
-        
-        
-        if async_add_entities is not None:
-            LOGGER.info("setup_entry: "+json.dumps(dict(config_entry.data)))
-            self.username=config_entry.data.get(CONF_USERNAME)
-            self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
-            self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
-            self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
-            self.include_disk=config_entry.data.get("disk")
-            self.include_sessions=config_entry.data.get("sessions")
-        else:
-            # For the quick test function
-            self.username=config_entry.get(CONF_USERNAME)
-            self.target_ip=config_entry.get(CONF_IP_ADDRESS)
-        
+        LOGGER.info("setup_entry: "+json.dumps(dict(config_entry.data)))
+        self.username=config_entry.data.get(CONF_USERNAME)
+        self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
+        self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
+        self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
+        self.include_disk=config_entry.data.get("disk")
+        self.include_sessions=config_entry.data.get("sessions")        
         self.cpu_usage=None
         self.ram_usage=None
         self.disk_usage=None

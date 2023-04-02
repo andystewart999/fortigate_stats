@@ -8,7 +8,8 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_USERNAME,
     CONF_IP_ADDRESS,
-    CONF_SCAN_INTERVAL
+    CONF_SCAN_INTERVAL,
+    DEFAULT_PORT
 )
 
 

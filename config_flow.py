@@ -1,4 +1,5 @@
 from .sensor import SnmpStatisticsMonitor
+from .snmp import snmp_getmulti
 import traceback
 import logging
 import json
@@ -14,6 +15,7 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_IP_ADDRESS,
     CONF_SCAN_INTERVAL,
+    DEFAULT_PORT
 )
 
 
@@ -32,6 +34,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         username = user_input[CONF_USERNAME]
         #password = user_input[CONF_PASSWORD]
         ipaddress= user_input[CONF_IP_ADDRESS]
+        port= user_input[DEFAULT_PORT]
         
         LOGGER.error (user_input[CONF_USERNAME])
         LOGGER.error (user_input["cpu_and_ram"])
@@ -45,9 +48,15 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         LOGGER.info("setup_entry: "+json.dumps(dict(user_input)))
         
         try:
-            SnmpStatisticsMonitor(user_input)
+            oids = ('1.3.6.1.2.1.1.5.0','1.3.6.1.4.1.12356.100.1.1.1.0')
+            LOGGER.error ("calling snmp_getmulti")
+            oidReturn = snmp_getmulti(host, username, port, oids)
             
-            #Get the hostname and the serial number (now, or later?)
+            user_input["hostname"] = oidReturn[0][1]
+            user_input["serialnumber"] = oidReturn[1][1]
+            
+            #SnmpStatisticsMonitor(user_input)
+
         except:
             e = traceback.format_exc()
             LOGGER.error("Unable to connect to snmp: %s", e)
@@ -56,7 +65,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             return self._show_form({"base": "connection_error"})
         
         return self.async_create_entry(
-            title=user_input[CONF_IP_ADDRESS],
+            title=user_input["hostname"],
             data=user_input
         )
 
