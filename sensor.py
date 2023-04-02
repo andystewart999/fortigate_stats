@@ -64,11 +64,7 @@ class SnmpStatisticsSensor(Entity):
             name=id
         self._name=name
         if unit is not None:
-            self._attributes={
-                                "unit_of_measurement":unit,
-                                "friendly_name":friendlyname,
-                                "made_up_thing":"test"
-                            }
+            self._unitofmeasurement=unit
         LOGGER.info("Create Sensor {0}".format(id))
 
     def set_state(self, state):
@@ -89,7 +85,6 @@ class SnmpStatisticsSensor(Entity):
         """Return the unique ID for this sensor."""
         return self.entity_id
 
-
     @property
     def should_poll(self):
         """Only poll to update phonebook, if defined."""
@@ -98,6 +93,10 @@ class SnmpStatisticsSensor(Entity):
     def device_state_attributes(self):
         """Return the state attributes."""
         return self._attributes
+    @property
+    def unit_of_measurement(self):
+        """Return the unit the value is expressed in."""
+        return self._unitofmeasurement
     @property
     def state(self):
         """Return the state of the device."""
@@ -361,19 +360,17 @@ class SnmpStatisticsMonitor:
         if id in self.meterSensors:
             LOGGER.error("id is in list")
             sensor=self.meterSensors[id]
-            LOGGER.error("setting attributes 1: unit=")+unit
-            sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname,"other_thing":"othertest"})
+            LOGGER.error("setting attributes 1: unit=")
+            sensor.set_attributes({"other_thing":"othertest"})
             LOGGER.error("updating state")
             sensor.set_state(value)
         else:
             LOGGER.error("id is not in list")
             sensor=SnmpStatisticsSensor(id,friendlyname,unit)
             sensor._state=value
-            LOGGER.error("setting attributes 2: unit=")+unit
+            LOGGER.error("setting attributes 2: unit=")
             sensor.set_attributes(
                     {
-                        "unit_of_measurement":unit,
-                        "friendly_name":friendlyname,
                         "made_up_thing":"test"
                     }
                 )
