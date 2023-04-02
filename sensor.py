@@ -94,6 +94,10 @@ class SnmpStatisticsSensor(Entity):
         """Return the state attributes."""
         return self._attributes
     @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        return self._attributes
+    @property
     def unit_of_measurement(self):
         """Return the unit the value is expressed in."""
         return self._unitofmeasurement
@@ -358,7 +362,6 @@ class SnmpStatisticsMonitor:
     
     def _AddOrUpdateEntity(self,id,friendlyname,value,unit):
         if id in self.meterSensors:
-            LOGGER.error("id is in list")
             sensor=self.meterSensors[id]
             LOGGER.error("setting attributes 1: unit=")
             sensor.set_attributes({"other_thing":"othertest"})
