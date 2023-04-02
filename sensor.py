@@ -26,17 +26,15 @@ from homeassistant.const import (
 async def async_setup_entry(hass, config_entry,async_add_entities):
     """Set up the sensor platform."""
     LOGGER.error('SETUP_ENTRY')
-    LOGGER.error("config_entry.data: "+json.dumps(dict(config_entry.data)))
-    LOGGER.error("config_entry.options: "+json.dumps(dict(config_entry.options)))
-    username=config_entry.data.get(CONF_USERNAME)
+    #username=config_entry.data.get(CONF_USERNAME)
     #password=config_entry.data.get(CONF_PASSWORD)
-    ipaddress=config_entry.data.get(CONF_IP_ADDRESS)
-    updateIntervalSeconds=config_entry.options.get(CONF_SCAN_INTERVAL)
+    #ipaddress=config_entry.data.get(CONF_IP_ADDRESS)
+    #updateIntervalSeconds=config_entry.options.get(CONF_SCAN_INTERVAL)
     maxretries=3
     
     for i in range(maxretries):
         try:
-            monitor = SnmpStatisticsMonitor(username,ipaddress,updateIntervalSeconds,async_add_entities)
+            monitor = SnmpStatisticsMonitor(config_entry,async_add_entities)
             break
         except:
             if i==maxretries-1:
@@ -107,21 +105,27 @@ class SnmpStatisticsSensor(Entity):
 
 class SnmpStatisticsMonitor:
 
-    def __init__(self,username,target_ip,updateIntervalSeconds=1,async_add_entities=None):
+    def __init__(self,config_entry,async_add_entities=None):
         self.meterSensors={}
         self.stopped = False
         self.async_add_entities=async_add_entities
-        self.updateIntervalSeconds=updateIntervalSeconds
         self.current_if_data={}
         self.current_if_data_time=0
         self.stat_time=0
-        self.username=username
-        self.target_ip=target_ip
-        self.hostname=None
-        self.serialnumber=None
+        
+        self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
+        username=
+        ipaddress=config_entry.data.get(CONF_IP_ADDRESS)
+
+        self.username=config_entry.data.get(CONF_USERNAME)
+        self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
+        self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
+        self.include_disk=config_entry.data.get("disk")
+        self.include_sessions=config_entry.data.get("sessions")
         self.cpu_usage=None
         self.ram_usage=None
         self.disk_usage=None
+        self.sessions=None
         self.cpuload3=None
         self.update_stats()#try this to throw error if not working.
         if async_add_entities is not None:
@@ -347,7 +351,7 @@ class SnmpStatisticsMonitor:
             LOGGER.error("id is in list")
             sensor=self.meterSensors[id]
             #LOGGER.error("setting attributes 1")
-            #sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname,"other_thing":"othertest"})
+            sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname,"other_thing":"othertest"})
             LOGGER.error("updating state")
             sensor.set_state(value)
         else:
