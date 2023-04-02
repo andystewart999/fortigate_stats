@@ -32,11 +32,14 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         #password = user_input[CONF_PASSWORD]
         ipaddress= user_input[CONF_IP_ADDRESS]
         
+        LOGGER.error (user_input[CONF_USERNAME])
+        LOGGER.error (user_input("cpu_and_ram"])
         self.include_cpu_and_ram = user_input["cpu_and_ram"]
         self.include_disk = user_input["disk"]
         self.include_sessions = user_input["sessions"]
         
-        LOGGER.error(self)
+        LOGGER.error(self.include_cpu_and_ram)
+        LOGGER.error(self.include_sessions)
         
         try:
             SnmpStatisticsMonitor(username, ipaddress)
