@@ -1,6 +1,7 @@
 from .sensor import SnmpStatisticsMonitor
 import traceback
 import logging
+import json
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
@@ -41,6 +42,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         
         LOGGER.error(self.include_cpu_and_ram)
         LOGGER.error(self.include_sessions)
+        LOGGER.info("setup_entry: "+json.dumps(dict(config_entry.data)))
         
         try:
             SnmpStatisticsMonitor(user_input)
