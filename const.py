@@ -17,7 +17,7 @@ CONFIG_SCHEMA_A=vol.Schema(
             {
                 vol.Required(CONF_USERNAME): str,
                 vol.Required(CONF_IP_ADDRESS): str,
-                vol.Optional(DEFAULT_PORT, default=161): int
+                vol.Optional(DEFAULT_PORT, default=161): int,
                 vol.Required("cpu_and_ram"): bool,
                 vol.Required("disk"): bool,
                 vol.Required("sessions"): bool,
