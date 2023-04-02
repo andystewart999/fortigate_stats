@@ -113,7 +113,9 @@ class SnmpStatisticsMonitor:
         self.current_if_data_time=0
         self.stat_time=0
         
-        #self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
+        LOGGER.info("setup_entry: "+json.dumps(dict(config_entry.data)))
+        
+        self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
         self.username=config_entry.data.get(CONF_USERNAME)
         self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
         self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
