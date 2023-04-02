@@ -42,7 +42,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         
         LOGGER.error(self.include_cpu_and_ram)
         LOGGER.error(self.include_sessions)
-        LOGGER.info("setup_entry: "+json.dumps(dict(config_entry.data)))
+        LOGGER.info("setup_entry: "+json.dumps(dict(user_input)))
         
         try:
             SnmpStatisticsMonitor(user_input)

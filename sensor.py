@@ -56,13 +56,19 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
 
 
 class SnmpStatisticsSensor(Entity):
-    def __init__(self,id,name=None):
+    def __init__(self,id,name=None,unit=None):
         self._attributes = {}
         self._state ="NOTRUN"
         self.entity_id=id
         if name is None:
             name=id
         self._name=name
+        if unit is not None:
+            self._attributes={
+                                "unit_of_measurement":unit,
+                                "friendly_name":friendlyname,
+                                "made_up_thing":"test"
+                            }
         LOGGER.info("Create Sensor {0}".format(id))
 
     def set_state(self, state):
@@ -355,7 +361,7 @@ class SnmpStatisticsMonitor:
         if id in self.meterSensors:
             LOGGER.error("id is in list")
             sensor=self.meterSensors[id]
-            #LOGGER.error("setting attributes 1")
+            LOGGER.error("setting attributes 1: unit=")+unit
             sensor.set_attributes({"unit_of_measurement":unit,"friendly_name":friendlyname,"other_thing":"othertest"})
             LOGGER.error("updating state")
             sensor.set_state(value)
@@ -363,7 +369,7 @@ class SnmpStatisticsMonitor:
             LOGGER.error("id is not in list")
             sensor=SnmpStatisticsSensor(id,friendlyname)
             sensor._state=value
-            LOGGER.error("setting attributes 2")
+            LOGGER.error("setting attributes 2: unit=")+unit
             sensor.set_attributes(
                     {
                         "unit_of_measurement":unit,
