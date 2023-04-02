@@ -1,4 +1,4 @@
-# Fortigate Stats (alpha 02040841)
+# Fortigate Stats (alpha 02042212)
 Home Assistant integration to show statistics from a FortiGate firewall, via SNMP
 - CPU, RAM and Disk usage
 - Session count
