@@ -367,7 +367,7 @@ class SnmpStatisticsMonitor:
             sensor.set_state(value)
         else:
             LOGGER.error("id is not in list")
-            sensor=SnmpStatisticsSensor(id,friendlyname)
+            sensor=SnmpStatisticsSensor(id,friendlyname,unit)
             sensor._state=value
             LOGGER.error("setting attributes 2: unit=")+unit
             sensor.set_attributes(
