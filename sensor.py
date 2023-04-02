@@ -23,7 +23,9 @@ from homeassistant.const import (
 
 async def async_setup_entry(hass, config_entry,async_add_entities):
     """Set up the sensor platform."""
-    LOGGER.info('SETUP_ENTRY')
+    LOGGER.error('SETUP_ENTRY')
+    LOGGER.error("config_entry.data: "+json.dumps(dict(config_entry.data)))
+    LOGGER.error("config_entry.options: "+json.dumps(dict(config_entry.options)))
     username=config_entry.data.get(CONF_USERNAME)
     #password=config_entry.data.get(CONF_PASSWORD)
     ipaddress=config_entry.data.get(CONF_IP_ADDRESS)
