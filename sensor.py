@@ -115,12 +115,9 @@ class SnmpStatisticsMonitor:
         self.target_ip=target_ip
         self.hostname=None
         self.serialnumber=None
-        self.include_cpu_and_ram = False
         self.cpu_usage=None
         self.ram_usage=None
-        self.include_disk = False
         self.disk_usage=None
-        self.include_sessions=None
         self.cpuload3=None
         self.update_stats()#try this to throw error if not working.
         if async_add_entities is not None:
