@@ -43,7 +43,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         LOGGER.error(self.include_sessions)
         
         try:
-            SnmpStatisticsMonitor(username, ipaddress)
+            SnmpStatisticsMonitor(user_input)
             
             #Get the hostname and the serial number (now, or later?)
         except:

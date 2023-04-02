@@ -115,12 +115,14 @@ class SnmpStatisticsMonitor:
         
         LOGGER.info("setup_entry: "+json.dumps(dict(config_entry.data)))
         
-        self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
         self.username=config_entry.data.get(CONF_USERNAME)
         self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
-        self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
-        self.include_disk=config_entry.data.get("disk")
-        self.include_sessions=config_entry.data.get("sessions")
+        if async_add_entities is not None:
+            self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
+            self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
+            self.include_disk=config_entry.data.get("disk")
+            self.include_sessions=config_entry.data.get("sessions")
+        
         self.cpu_usage=None
         self.ram_usage=None
         self.disk_usage=None
