@@ -20,7 +20,8 @@ CONFIG_SCHEMA_A=vol.Schema(
                 vol.Required(CONF_IP_ADDRESS): str,
                 vol.Required("cpu_and_ram"): bool,
                 vol.Required("disk"): bool,
-                vol.Required("sessions"): bool
+                vol.Required("sessions"): bool,
+                vol.Optional(CONF_SCAN_INTERVAL, default=10): int
             }
 )
 
