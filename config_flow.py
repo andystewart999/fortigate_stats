@@ -50,8 +50,10 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             LOGGER.error ("calling snmp_getmulti")
             oidReturn = snmp_getmulti(ipaddress, username, port, oids)
             
-            user_input["hostname"] = oidReturn[0][1]
-            user_input["serialnumber"] = oidReturn[1][1]
+            user_input["hostname"] = oidReturn[0][1].prettyPrint()
+            user_input["serialnumber"] = oidReturn[1][1].prettyPrint()
+            LOGGER.error("hostname: ") + user_input["hostname"]
+            LOGGER.error("serial: ") user_input["serialnumber"]
             
             #SnmpStatisticsMonitor(user_input)
 
