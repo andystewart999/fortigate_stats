@@ -14,6 +14,11 @@ LOGGER = logging.getLogger(__package__)
 DOMAIN = "fortigate_stats"
 DEFAULT_SCAN_INTERVAL = 10
 
+#OIDS
+OID_HOSTNAME = '1.3.6.1.2.1.1.5.0'
+OID_SERIALNUMBER = '1.3.6.1.4.1.12356.100.1.1.1.0'
+OID_MODEL = '1.3.6.1.2.1.1.1'
+
 CONFIG_SCHEMA_A=vol.Schema(
             {
                 vol.Required(CONF_USERNAME): str,

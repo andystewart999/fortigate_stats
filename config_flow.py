@@ -46,14 +46,17 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         LOGGER.error(self.include_sessions)
         
         try:
-            oids = ('1.3.6.1.2.1.1.5.0','1.3.6.1.4.1.12356.100.1.1.1.0')
+            oids = (OID_HOSTNAME, OID_SERIALNUMBER, OID_MODEL)
             LOGGER.error ("calling snmp_getmulti")
             oidReturn = snmp_getmulti(ipaddress, username, port, oids)
             
             user_input["hostname"] = oidReturn[0][1].prettyPrint()
             user_input["serialnumber"] = oidReturn[1][1].prettyPrint()
-            LOGGER.error("hostname: ") + user_input["hostname"]
-            LOGGER.error("serial: ") user_input["serialnumber"]
+            user_input["model"] = oidReturn[2][1].prettyPrint()
+            
+            LOGGER.error("hostname: " + user_input["hostname"])
+            LOGGER.error("serial: " + user_input["serialnumber"])
+            LOGGER.error("model: " + user_input["model"])
             
             #SnmpStatisticsMonitor(user_input)
 

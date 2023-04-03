@@ -112,6 +112,21 @@ class SnmpStatisticsSensor(Entity):
     def update(self):
         LOGGER.info("update "+self.entity_id)
 
+    #Speculative
+    @property
+    def device_info(self):
+        """Return device info for this sensor."""
+#        if self._config_entry is None:
+#            indentifier = {(DOMAIN, self.config["host"].replace(".", "_"))}
+#        else:
+        identifier = {(DOMAIN, self.serialnumber)}
+        return {
+            "identifiers": identifier,
+            "name": "Fortigate Stats",
+            "manufacturer": "Fortinet",
+            "serialnumber": self.serialnumber
+        }
+
 class SnmpStatisticsMonitor:
 
     def __init__(self,config_entry,async_add_entities=None):
