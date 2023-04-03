@@ -2,7 +2,6 @@ from .sensor import SnmpStatisticsMonitor
 from .snmp import snmp_getmulti
 import traceback
 import logging
-import json
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
@@ -45,12 +44,11 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         
         LOGGER.error(self.include_cpu_and_ram)
         LOGGER.error(self.include_sessions)
-        LOGGER.info("setup_entry: "+json.dumps(dict(user_input)))
         
         try:
             oids = ('1.3.6.1.2.1.1.5.0','1.3.6.1.4.1.12356.100.1.1.1.0')
             LOGGER.error ("calling snmp_getmulti")
-            oidReturn = snmp_getmulti(host, username, port, oids)
+            oidReturn = snmp_getmulti(ipaddress, username, port, oids)
             
             user_input["hostname"] = oidReturn[0][1]
             user_input["serialnumber"] = oidReturn[1][1]

@@ -4,7 +4,6 @@ import time
 import traceback
 from datetime import datetime
 import sys
-import json
 
 # pylint: disable=unused-wildcard-import
 from .const import * 
@@ -122,7 +121,6 @@ class SnmpStatisticsMonitor:
         self.current_if_data={}
         self.current_if_data_time=0
         self.stat_time=0
-        LOGGER.info("setup_entry: "+json.dumps(dict(config_entry.data)))
         self.username=config_entry.data.get(CONF_USERNAME)
         self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
         self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
