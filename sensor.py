@@ -59,12 +59,16 @@ class SnmpStatisticsSensor(Entity):
     def __init__(self,id,name=None,unit=None):
         self._attributes = {}
         self._state ="NOTRUN"
+        self._serialnumber = self.more_data[OID_SERIALNUMBER]
         self.entity_id=id
         if name is None:
             name=id
         self._name=name
         if unit is not None:
             self._unitofmeasurement=unit
+            
+        if self.more_data[OID_MODEL] is not None:
+            self._model = self.more_data[OID_MODEL]
         LOGGER.info("Create Sensor {0}".format(id))
 
     def set_state(self, state):
@@ -119,12 +123,12 @@ class SnmpStatisticsSensor(Entity):
 #        if self._config_entry is None:
 #            indentifier = {(DOMAIN, self.config["host"].replace(".", "_"))}
 #        else:
-        identifier = {(DOMAIN, self.serialnumber)}
+        identifier = {(DOMAIN, self.config_entry["serialnumber"])}
         return {
             "identifiers": identifier,
             "name": "Fortigate Stats",
             "manufacturer": "Fortinet",
-            "serialnumber": self.serialnumber
+            "serialnumber": self.config_entry["serialnumber"]
         }
 
 class SnmpStatisticsMonitor:
@@ -222,10 +226,10 @@ class SnmpStatisticsMonitor:
     def update_stats(self):
         self.update_netif_stats()
         more_data=__class__.get(self.target_ip,[
-            '1.3.6.1.2.1.1.5.0',
-            '1.3.6.1.4.1.12356.100.1.1.1.0',
-            '1.3.6.1.4.1.12356.101.4.1.3.0',
-            '1.3.6.1.4.1.12356.101.4.1.4.0'
+            OID_HOSTNAME,
+            OID_SERIALNUMBER,
+            OID_CPUUSAGE,
+            OID_RAMUSAGE
             ],hlapi.CommunityData(self.username))
         
             #hostname, serialnumber, cpu usage, ram usage    
@@ -242,10 +246,14 @@ class SnmpStatisticsMonitor:
         #print(more_data['1.3.6.1.2.1.1.5.0'])
         #for k,v in more_data:
         #    print(f"{k}:{v}")
-        self.hostname=more_data['1.3.6.1.2.1.1.5.0']                    #don't need to update these two every time
-        self.serialnumber=more_data['1.3.6.1.4.1.12356.100.1.1.1.0']
-        self.cpu_usage=more_data['1.3.6.1.4.1.12356.101.4.1.3.0']
-        self.ram_usage=more_data['1.3.6.1.4.1.12356.101.4.1.4.0']
+        
+        #TESTING THIS APPROACH
+        self.more_data = more_data
+        self.hostname=more_data[OID_HOSTNAME]                    #don't need to update these two every time
+        self.serialnumber=more_data[OID_SERIALNUMBER]
+        self.model=more_data[OID_MODEL]
+        self.cpu_usage=more_data[OID_CPUUSAGE]
+        self.ram_usage=more_data[OID_RAMUSAGE]
         #self.cpuload3=more_data['1.3.6.1.4.1.2021.10.1.3.3']
 
     def update_netif_stats(self):
