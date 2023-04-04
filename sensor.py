@@ -56,10 +56,11 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
 
 
 class SnmpStatisticsSensor(Entity):
-    def __init__(self,id,name=None,unit=None):
+    def __init__(self,id,more_data,name=None,unit=None):
         self._attributes = {}
+        self._more_data = more_data
         self._state ="NOTRUN"
-        self._serialnumber = self.more_data[OID_SERIALNUMBER]
+        self._serialnumber = self._more_data[OID_SERIALNUMBER]
         self.entity_id=id
         if name is None:
             name=id
@@ -67,8 +68,8 @@ class SnmpStatisticsSensor(Entity):
         if unit is not None:
             self._unitofmeasurement=unit
             
-        if self.more_data[OID_MODEL] is not None:
-            self._model = self.more_data[OID_MODEL]
+        if self._more_data[OID_MODEL] is not None:
+            self._model = self._more_data[OID_MODEL]
         LOGGER.info("Create Sensor {0}".format(id))
 
     def set_state(self, state):
@@ -123,12 +124,12 @@ class SnmpStatisticsSensor(Entity):
 #        if self._config_entry is None:
 #            indentifier = {(DOMAIN, self.config["host"].replace(".", "_"))}
 #        else:
-        identifier = {(DOMAIN, self.config_entry["serialnumber"])}
+        identifier = {(DOMAIN, self._more_data[OID_SERIALNUMBER])}
         return {
             "identifiers": identifier,
             "name": "Fortigate Stats",
             "manufacturer": "Fortinet",
-            "serialnumber": self.config_entry["serialnumber"]
+            "serialnumber": self._more_data["serialnumber"]
         }
 
 class SnmpStatisticsMonitor:
@@ -229,7 +230,8 @@ class SnmpStatisticsMonitor:
             OID_HOSTNAME,
             OID_SERIALNUMBER,
             OID_CPUUSAGE,
-            OID_RAMUSAGE
+            OID_RAMUSAGE,
+            OID_MODEL
             ],hlapi.CommunityData(self.username))
         
             #hostname, serialnumber, cpu usage, ram usage    
@@ -248,7 +250,7 @@ class SnmpStatisticsMonitor:
         #    print(f"{k}:{v}")
         
         #TESTING THIS APPROACH
-        self.more_data = more_data
+        self._more_data = more_data
         self.hostname=more_data[OID_HOSTNAME]                    #don't need to update these two every time
         self.serialnumber=more_data[OID_SERIALNUMBER]
         self.model=more_data[OID_MODEL]
@@ -383,7 +385,7 @@ class SnmpStatisticsMonitor:
             sensor.set_state(value)
         else:
             LOGGER.error("id is not in list")
-            sensor=SnmpStatisticsSensor(id,friendlyname,unit)
+            sensor=SnmpStatisticsSensor(id,self.more_data,friendlyname,unit)
             sensor._state=value
             LOGGER.error("setting attributes 2: unit=")
             sensor.set_attributes(
