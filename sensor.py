@@ -40,8 +40,6 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
             if i==maxretries-1:
                 raise
 
-
-        
         
     hass.data[DOMAIN][config_entry.entry_id]={"monitor":monitor}
     
@@ -223,15 +221,21 @@ class SnmpStatisticsMonitor:
     #endregion
     def update_stats(self):
         self.update_netif_stats()
-        fw_data=__class__.get(self.target_ip,[
-            OID_HOSTNAME,
-            OID_SERIALNUMBER,
-            OID_CPUUSAGE,
-            OID_RAMUSAGE,
-            OID_MODEL
-            ],hlapi.CommunityData(self.username))
+#        fw_data=__class__.get(self.target_ip,[
+#            OID_HOSTNAME,
+#            OID_SERIALNUMBER,
+#            OID_CPUUSAGE,
+#            OID_RAMUSAGE,
+#            OID_MODEL
+#            ],hlapi.CommunityData(self.username))
         
-            #hostname, serialnumber, cpu usage, ram usage    
+        fw_data[OID_HOSTNAME] = "fortigate-100d.local"
+        fw_data[OID_SERIALNUMBER] = "XYZ123"
+        fw_data[OID_CPUUSAGE] = 11
+        fw_data[OID_RAMUSAGE] = 22
+        fw_data[MODEL] = "FG100D"
+        
+        #hostname, serialnumber, cpu usage, ram usage    
         #cpu usage://1.3.6.1.2.1.25.3.3[.1...4]
         #cpu_usages= __class__.get_bulk(self.target_ip, [
         #    '1.3.6.1.2.1.25.3.3',

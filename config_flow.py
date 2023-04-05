@@ -48,11 +48,13 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         try:
             oids = (OID_HOSTNAME, OID_SERIALNUMBER, OID_MODEL)
             LOGGER.error ("calling snmp_getmulti")
-            oidReturn = snmp_getmulti(ipaddress, username, port, oids)
-            
-            user_input["hostname"] = oidReturn[0][1].prettyPrint()
-            user_input["serialnumber"] = oidReturn[1][1].prettyPrint()
-            user_input["model"] = oidReturn[2][1].prettyPrint()
+            #oidReturn = snmp_getmulti(ipaddress, username, port, oids)
+            #user_input["hostname"] = oidReturn[0][1].prettyPrint()
+            #user_input["serialnumber"] = oidReturn[1][1].prettyPrint()
+            #user_input["model"] = oidReturn[2][1].prettyPrint()
+            user_input["hostname"] = "fortigate-100d.local"
+            user_input["serialnumber"] = "XYZ123"
+            user_input["model"] = "FG100D"
             
             LOGGER.error("hostname: " + user_input["hostname"])
             LOGGER.error("serial: " + user_input["serialnumber"])
