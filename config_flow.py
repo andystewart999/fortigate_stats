@@ -37,29 +37,29 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         
         LOGGER.error (user_input[CONF_USERNAME])
         LOGGER.error (user_input["cpu_and_ram"])
-        self.include_cpu_and_ram = user_input["cpu_and_ram"]
-        self.include_disk = user_input["disk"]
-        LOGGER.error ("self.include_sessions:")
-        self.include_sessions = user_input["sessions"]
-        
-        LOGGER.error(self.include_cpu_and_ram)
-        LOGGER.error(self.include_sessions)
-        
+        LOGGER.error (user_input["sessions"])
+                
         try:
+            #We only need to get this information once, so get it as part of the connection test and add it to user_input
             oids = (OID_HOSTNAME, OID_SERIALNUMBER, OID_MODEL)
             LOGGER.error ("calling snmp_getmulti")
             #oidReturn = snmp_getmulti(ipaddress, username, port, oids)
             #user_input["hostname"] = oidReturn[0][1].prettyPrint()
             #user_input["serialnumber"] = oidReturn[1][1].prettyPrint()
             #user_input["model"] = oidReturn[2][1].prettyPrint()
-            user_input["hostname"] = "fortigate-100d.local"
-            user_input["serialnumber"] = "XYZ123"
-            user_input["model"] = "FG100D"
+            fw_info = {
+                OID_HOSTNAME: "fortigate-100d.local",
+                OID_SERIALNUMBER: "XYZ123",
+                OID_MODEL: "FG100D"
+            }
             
-            LOGGER.error("hostname: " + user_input["hostname"])
-            LOGGER.error("serial: " + user_input["serialnumber"])
-            LOGGER.error("model: " + user_input["model"])
-            
+            LOGGER.error("hostname: " + fw_info["hostname"])
+            LOGGER.error("serial: " + fw_info["serialnumber"])
+            LOGGER.error("model: " + fw_info["model"])
+           
+            user_input[OID_HOSTNAME] = fw_info[OID_HOSTNAME]
+            user_input[OID_SERIALNUMBER] = fw_info[OID_SERIALNUMBER]
+            user_input[OID_MODEL] = fw_info[OID_MODEL]
         except:
             e = traceback.format_exc()
             LOGGER.error("Unable to connect to snmp: %s", e)

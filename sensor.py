@@ -54,10 +54,12 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
 
 
 class SnmpStatisticsSensor(Entity):
-    def __init__(self,id,fw_data,name=None,unit=None):
+    def __init__(self,id,fw_info,name=None,unit=None):
         self._attributes = {}
         self._state ="NOTRUN"
-        self._fw_data = fw_data
+        LOGGER.error("fw_info (60): " + fw_info[OID_SERIALNUMBER])
+        self.serialnumber=fw_info[OID_SERIALNUMBER]
+        self.fw_info = fw_info
         self.entity_id=id
         if name is None:
             name=id
@@ -119,12 +121,13 @@ class SnmpStatisticsSensor(Entity):
 #        if self._config_entry is None:
 #            indentifier = {(DOMAIN, self.config["host"].replace(".", "_"))}
 #        else:
-        identifier = {(DOMAIN, self._fw_data[OID_SERIALNUMBER])}
+        identifier = {(DOMAIN, self.fw_info[OID_SERIALNUMBER])}
+        #identifier = {(DOMAIN, self.serialnumber)}
         return {
             "identifiers": identifier,
-            "name": "Fortigate Stats",
+            "name": self.fw_info[OID_HOSTNAME],
             "manufacturer": "Fortinet",
-            "serialnumber": self._fw_data[OID_SERIALNUMBER]
+            "model": self.fw_info[OID_MODEL]
         }
 
 class SnmpStatisticsMonitor:
@@ -137,16 +140,27 @@ class SnmpStatisticsMonitor:
         self.current_if_data_time=0
         self.stat_time=0
         self.username=config_entry.data.get(CONF_USERNAME)
+        LOGGER.error("config entry data get (CONF_USERNAME)")
+        LOGGER.error(self.username)
         self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
+        LOGGER.error("config entry data get (CONF_IP_ADDRESS)")
+        LOGGER.error(self.target_ip)
         self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
         self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
+        LOGGER.error ("config_entry.data.get(cpu_and_ram)")
+        LOGGER.error(config_entry.data.get("cpu_and_ram"))
         self.include_disk=config_entry.data.get("disk")
-        self.include_sessions=config_entry.data.get("sessions")        
+        self.include_sessions=config_entry.data.get("sessions")
         self.cpu_usage=None
         self.ram_usage=None
         self.disk_usage=None
         self.sessions=None
         self.cpuload3=None
+        self.fw_info = {
+            OID_HOSTNAME: config_entry.data.get(OID_HOSTNAME),
+            OID_SERIALNUMBER: config_entry.data.get(OID_SERIALNUMBER),
+            OID_MODEL: config_entry.data.get(OID_MODEL)
+            }
         self.update_stats()#try this to throw error if not working.
         if async_add_entities is not None:
             self.setupEntities()
@@ -220,20 +234,16 @@ class SnmpStatisticsMonitor:
 
     #endregion
     def update_stats(self):
-        self.update_netif_stats()
-#        fw_data=__class__.get(self.target_ip,[
-#            OID_HOSTNAME,
-#            OID_SERIALNUMBER,
+        #self.update_netif_stats()
+#        fw_stats=__class__.get(self.target_ip,[
 #            OID_CPUUSAGE,
 #            OID_RAMUSAGE,
-#            OID_MODEL
 #            ],hlapi.CommunityData(self.username))
         
-        fw_data[OID_HOSTNAME] = "fortigate-100d.local"
-        fw_data[OID_SERIALNUMBER] = "XYZ123"
-        fw_data[OID_CPUUSAGE] = 11
-        fw_data[OID_RAMUSAGE] = 22
-        fw_data[MODEL] = "FG100D"
+        fw_stats = {
+            OID_CPUUSAGE: 11,
+            OID_RAMUSAGE: 22,
+            }
         
         #hostname, serialnumber, cpu usage, ram usage    
         #cpu usage://1.3.6.1.2.1.25.3.3[.1...4]
@@ -251,10 +261,10 @@ class SnmpStatisticsMonitor:
         #    print(f"{k}:{v}")
         
         #TESTING THIS APPROACH
-        self._fw_data = fw_data
-        self.hostname=fw_data[OID_HOSTNAME]                    #don't need to update these two every time
-        self.serialnumber=fw_data[OID_SERIALNUMBER]
-        self.model=fw_data[OID_MODEL]
+        self.fw_stats = fw_stats                                
+        LOGGER.error ("fw_stats: " + fw_stats[OID_CPUUSAGE])
+        LOGGER.error ("_fw_stats: " + self.fw_stats[OID_RAMUSAGE])
+        
         self.cpu_usage=fw_data[OID_CPUUSAGE]
         self.ram_usage=fw_data[OID_RAMUSAGE]
         #self.cpuload3=more_data['1.3.6.1.4.1.2021.10.1.3.3']
@@ -386,7 +396,8 @@ class SnmpStatisticsMonitor:
             sensor.set_state(value)
         else:
             LOGGER.error("id is not in list")
-            sensor=SnmpStatisticsSensor(id,self.fw_data,friendlyname,unit)
+            LOGGER.error("fw_info (399): " + self.fw_info[OID_SERIALNUMBER])
+            sensor=SnmpStatisticsSensor(id,self.fw_info,friendlyname,unit)
             sensor._state=value
             LOGGER.error("setting attributes 2: unit=")
             sensor.set_attributes(
@@ -400,7 +411,7 @@ class SnmpStatisticsMonitor:
             self.meterSensors[id]=sensor
         
     def AddOrUpdateEntities(self):
-        allSensorsPrefix = "sensor." + DOMAIN + "_" + self.serialnumber.replace('.','_') + "_"
+        allSensorsPrefix = "sensor." + DOMAIN + "_" + self.fw_data[OID_SERIALNUMBER].replace('.','_') + "_"
         # for k in self.current_if_data:
             # cur_if_data=self.current_if_data[k]
             # if_name=cur_if_data['name2']
