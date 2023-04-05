@@ -1,4 +1,4 @@
-from .sensor import SnmpStatisticsMonitor
+#from .sensor import SnmpStatisticsMonitor
 from .snmp import snmp_getmulti
 import traceback
 import logging
@@ -58,8 +58,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             LOGGER.error("serial: " + user_input["serialnumber"])
             LOGGER.error("model: " + user_input["model"])
             
-            #SnmpStatisticsMonitor(user_input)
-
         except:
             e = traceback.format_exc()
             LOGGER.error("Unable to connect to snmp: %s", e)
