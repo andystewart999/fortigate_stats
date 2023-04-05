@@ -41,7 +41,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                 
         try:
             #We only need to get this information once, so get it as part of the connection test and add it to user_input
-            oids = (OID_HOSTNAME, OID_SERIALNUMBER, OID_MODEL)
+            oids = (OID_HOSTNAME, OID_SERIALNUMBER, OID_MODEL,OID_FORTIOS)
             LOGGER.error ("calling snmp_getmulti")
             #oidReturn = snmp_getmulti(ipaddress, username, port, oids)
             #user_input["hostname"] = oidReturn[0][1].prettyPrint()
@@ -50,12 +50,13 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             fw_info = {
                 OID_HOSTNAME: "fortigate-100d.local",
                 OID_SERIALNUMBER: "XYZ123",
-                OID_MODEL: "FG100D"
+                OID_MODEL: "FG100D",
+                OID_FORTIOS: "6.2.11"
             }
             
-            LOGGER.error("hostname: " + fw_info["hostname"])
-            LOGGER.error("serial: " + fw_info["serialnumber"])
-            LOGGER.error("model: " + fw_info["model"])
+            LOGGER.error("hostname: " + fw_info[OID_HOSTNAME])
+            LOGGER.error("serial: " + fw_info[OID_SERIALNUMBER])
+            LOGGER.error("model: " + fw_info[OID_MODEL])
            
             user_input[OID_HOSTNAME] = fw_info[OID_HOSTNAME]
             user_input[OID_SERIALNUMBER] = fw_info[OID_SERIALNUMBER]
@@ -68,7 +69,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             return self._show_form({"base": "connection_error"})
         
         return self.async_create_entry(
-            title=user_input["hostname"],
+            title=user_input[OID_HOSTNAME],
             data=user_input
         )
 

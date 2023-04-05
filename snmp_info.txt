@@ -3,7 +3,7 @@
 # General information
 FortiOS version           .1.3.6.1.4.1.12356.101.4.1.1.0                  .iso.org.dod.internet.private.enterprises.fortinet.fnFortiGateMib.fgSystem.fgSystemInfo.fgSysVersion
 FortiGate serial number   .1.3.6.1.4.1.12356.100.1.1.1.0
-FortiGate model			  .1.3.6.1.2.1.1.1
+FortiGate model			  .1.3.6.1.2.1.1.1 #Nope
 
 # Resource usage information
 CPU usage (%)             .1.3.6.1.4.1.12356.101.4.1.3.0                  .iso.org.dod.internet.private.enterprises.fortinet.fnFortiGateMib.fgSystem.fgSystemInfo.fgSysCpuUsage

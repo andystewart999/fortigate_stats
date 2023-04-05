@@ -1,3 +1,4 @@
+import random #NOT NEEDED AFTER TESTING IS DONE
 from pysnmp import hlapi
 from pysnmp.error import PySnmpError
 import time
@@ -54,7 +55,7 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
 
 
 class SnmpStatisticsSensor(Entity):
-    def __init__(self,id,fw_info,name=None,unit=None):
+    def __init__(self,id,fw_info,name=None,unit=None,icon=None):
         self._attributes = {}
         self._state ="NOTRUN"
         LOGGER.error("fw_info (60): " + fw_info[OID_SERIALNUMBER])
@@ -66,6 +67,9 @@ class SnmpStatisticsSensor(Entity):
         self._name=name
         if unit is not None:
             self._unitofmeasurement=unit
+        if icon is None:
+            icon = "mdi:eye"
+        self.icon = icon
             
         LOGGER.info("Create Sensor {0}".format(id))
 
@@ -77,12 +81,16 @@ class SnmpStatisticsSensor(Entity):
         if self.enabled:
             self.schedule_update_ha_state()
 
-
     def set_attributes(self, attributes):
         """Set the state attributes."""
         self._attributes = attributes
 
     @property
+    def icon(self):
+        """Return the icon to be used for this entity."""
+        return self.icon 
+ 
+ @property
     def unique_id(self) -> str:
         """Return the unique ID for this sensor."""
         return self.entity_id
@@ -127,7 +135,8 @@ class SnmpStatisticsSensor(Entity):
             "identifiers": identifier,
             "name": self.fw_info[OID_HOSTNAME],
             "manufacturer": "Fortinet",
-            "model": self.fw_info[OID_MODEL]
+            "model": self.fw_info[OID_MODEL],
+            "sw_version": self.fw_info[OID_FORTIOS]
         }
 
 class SnmpStatisticsMonitor:
@@ -241,8 +250,8 @@ class SnmpStatisticsMonitor:
 #            ],hlapi.CommunityData(self.username))
         
         fw_stats = {
-            OID_CPUUSAGE: 11,
-            OID_RAMUSAGE: 22,
+            OID_CPUUSAGE: random.randint(0,100),
+            OID_RAMUSAGE: random.randint(0,100),
             }
         
         #hostname, serialnumber, cpu usage, ram usage    
@@ -262,11 +271,11 @@ class SnmpStatisticsMonitor:
         
         #TESTING THIS APPROACH
         self.fw_stats = fw_stats                                
-        LOGGER.error ("fw_stats: " + fw_stats[OID_CPUUSAGE])
-        LOGGER.error ("_fw_stats: " + self.fw_stats[OID_RAMUSAGE])
+        LOGGER.error ("fw_stats: " + str(fw_stats[OID_CPUUSAGE]))
+        LOGGER.error ("_fw_stats: " + str(self.fw_stats[OID_RAMUSAGE]))
         
-        self.cpu_usage=fw_data[OID_CPUUSAGE]
-        self.ram_usage=fw_data[OID_RAMUSAGE]
+        self.cpu_usage=fw_stats[OID_CPUUSAGE]
+        self.ram_usage=fw_stats[OID_RAMUSAGE]
         #self.cpuload3=more_data['1.3.6.1.4.1.2021.10.1.3.3']
 
     def update_netif_stats(self):
@@ -411,7 +420,7 @@ class SnmpStatisticsMonitor:
             self.meterSensors[id]=sensor
         
     def AddOrUpdateEntities(self):
-        allSensorsPrefix = "sensor." + DOMAIN + "_" + self.fw_data[OID_SERIALNUMBER].replace('.','_') + "_"
+        allSensorsPrefix = "sensor." + DOMAIN + "_" + self.fw_info[OID_SERIALNUMBER].replace('.','_') + "_"
         # for k in self.current_if_data:
             # cur_if_data=self.current_if_data[k]
             # if_name=cur_if_data['name2']
@@ -443,10 +452,10 @@ class SnmpStatisticsMonitor:
 
 
 
-        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpu_usage,'%')
+        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpu_usage,'%',"mdi:cpu-64-bit")
         
         if self.include_sessions:
-            self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage,'%')
+            self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage,'%',"mdi:memory")
         #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
         
 
