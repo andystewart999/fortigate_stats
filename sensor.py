@@ -7,7 +7,7 @@ import sys
 
 # pylint: disable=unused-wildcard-import
 from .const import * 
-from .snmp import snmp_getnext
+from .snmp import snmp_getfromtable
 
 # pylint: enable=unused-wildcard-import
 import threading
@@ -248,7 +248,7 @@ class SnmpStatisticsMonitor:
                 OID_DISKCAPACITY,
                 ],hlapi.CommunityData(self.username))
 
-            self.disk_usage = int((snmp_data[OID_DISKUSAGE] / snmp_data[OID_DISKCAPACITY])) * 100
+            self.disk_usage = int((snmp_data[OID_DISKUSAGE] / snmp_data[OID_DISKCAPACITY]) * 100)
 
         if self.include_sessions:
             errorIndication, snmp_data = snmp_getfromtable(self.target_ip, self.username, self.port, OID_SESSIONCOUNT)
@@ -258,7 +258,7 @@ class SnmpStatisticsMonitor:
                 
                 for oid_entry in snmp_data:
                     for oid, oid_value in oid_entry:
-                        sessioncount = sessioncount + val(oid_value.prettyPrint())
+                        sessioncount = sessioncount + int(oid_value.prettyPrint())
             
             self.sessions = sessioncount
         
@@ -439,7 +439,7 @@ class SnmpStatisticsMonitor:
             self._AddOrUpdateEntity(allSensorsPrefix+"disk_usage","Disk usage",self.disk_usage,'%',"mdi:database")
         
         if self.include_sessions:
-            self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'%',"mdi:format-list-bulleted-type")
+            self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'sessions',"mdi:format-list-bulleted-type")
             
             
         #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
