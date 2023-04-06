@@ -17,29 +17,29 @@ def snmp_get(host, user, port, oid):
         value = val
 
     try:
-        return int(value)
+        return errorIndication, int(value)
     except (ValueError, TypeError):
         try:
-            return float(value)
+            return errorIndication, float(value)
         except (ValueError, TypeError):
             try:
-                return str(value)
+                return errorIndication, str(value)
             except (ValueError, TypeError):
                 pass
-    return value
+    return errorIndication, value
 
 
-def snmp_getnext(host, user, port, oid):
+def snmp_getfromtable(host, user, port, oid):
     # connect and get data from host
     auth = cmdgen.CommunityData(user) ## More error trapping here!
     cmdGen = cmdgen.CommandGenerator()
-    errorIndication, errorStatus, errorIndex, varTable = cmdGen.getNext(
+    errorIndication, errorStatus, errorIndex, varTable = cmdGen.nextCmd(
         auth, cmdgen.UdpTransportTarget((host, port)),
         cmdgen.MibVariable(oid),  
         lookupMib = False,
     )
     
-    return varTable 
+    return errorIndication, varTable 
 
  
 def snmp_getmulti(host, user, port, oids):
@@ -52,4 +52,4 @@ def snmp_getmulti(host, user, port, oids):
         lookupMib = False,
     )
 
-    return varBinds
+    return errorIndication, varBinds

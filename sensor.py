@@ -251,11 +251,14 @@ class SnmpStatisticsMonitor:
             self.disk_usage = int((snmp_data[OID_DISKUSAGE] / snmp_data[OID_DISKCAPACITY])) * 100
 
         if self.include_sessions:
-            snmp_data = snmp_getnext(self.target_ip, self.username, self.port, OID_SESSIONCOUNT)
+            errorIndication, snmp_data = snmp_getfromtable(self.target_ip, self.username, self.port, OID_SESSIONCOUNT)
+            
             sessioncount = 0
-            for oid_entry in snmp_data:
-                for oid, oid_value in oid_entry:
-                    sessioncount = sessioncount + val(oid_value.prettyPrint())
+            if not errorIndication:
+                
+                for oid_entry in snmp_data:
+                    for oid, oid_value in oid_entry:
+                        sessioncount = sessioncount + val(oid_value.prettyPrint())
             
             self.sessions = sessioncount
         

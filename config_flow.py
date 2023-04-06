@@ -36,11 +36,13 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         try:
             #We only need to get this information once, so get it as part of the connection test and add it to user_input
             oids = (OID_HOSTNAME, OID_SERIALNUMBER, OID_MODEL,OID_FORTIOS)
-            oidReturn = snmp_getmulti(ipaddress, username, port, oids)
-            user_input[OID_HOSTNAME] = oidReturn[0][1].prettyPrint()
-            user_input[OID_SERIALNUMBER] = oidReturn[1][1].prettyPrint()
-            user_input[OID_MODEL] = oidReturn[2][1].prettyPrint()
-            user_input[OID_FORTIOS] = oidReturn[3][1].prettyPrint()
+            errorIndication, oidReturn = snmp_getmulti(ipaddress, username, port, oids)
+            
+            if not errorIndication:
+                user_input[OID_HOSTNAME] = oidReturn[0][1].prettyPrint()
+                user_input[OID_SERIALNUMBER] = oidReturn[1][1].prettyPrint()
+                user_input[OID_MODEL] = oidReturn[2][1].prettyPrint()
+                user_input[OID_FORTIOS] = oidReturn[3][1].prettyPrint()
             
         except:
             e = traceback.format_exc()
