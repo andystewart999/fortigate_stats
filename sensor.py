@@ -435,7 +435,7 @@ class SnmpStatisticsMonitor:
         if self.include_disk:
             self._AddOrUpdateEntity(allSensorsPrefix+"disk_usage","Disk usage",self.disk_usage,'%',"mdi:database")
         
-       if self.include_sessions:
+        if self.include_sessions:
             self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'%',"mdi:format-list-bulleted-type")
             
             
