@@ -19,10 +19,15 @@
 					"sessions": "Monitor session count"
                 },
                 "title": "Enter firewall details"
+            },
+            "interfaces": {
+                "data": {
+                    "interfaces": "Select interfaces"
+                },
+                "title": "Firewall interfaces"
             }
-            
         },
-        "title": "Fortigate stats"
+        "title": "Fortigate Stats"
     },
     "options":{
         "step":{

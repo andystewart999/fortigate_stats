@@ -27,7 +27,7 @@ OID_DISKCAPACITY = '1.3.6.1.4.1.12356.101.4.1.7.0'
 
 OID_SESSIONCOUNT = '1.3.6.1.4.1.12356.101.4.5.3.1.8'
 
-CONFIG_SCHEMA_A=vol.Schema(
+CONFIG_SCHEMA_MAIN=vol.Schema(
             {
                 vol.Required(CONF_USERNAME): str,
                 vol.Required(CONF_IP_ADDRESS): str,
@@ -39,9 +39,15 @@ CONFIG_SCHEMA_A=vol.Schema(
             }
 )
 
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: CONFIG_SCHEMA_A
-    },
-    extra=vol.ALLOW_EXTRA,
+CONFIG_SCHEMA_INTERFACES=vol.Schema(
+            {
+                vol.Required(CONF_INTERFACES): str
+            }
 )
+
+#CONFIG_SCHEMA = vol.Schema(
+#    {
+#        DOMAIN: CONFIG_SCHEMA_A
+#    },
+#    extra=vol.ALLOW_EXTRA,
+#)

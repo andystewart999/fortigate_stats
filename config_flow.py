@@ -20,14 +20,14 @@ from homeassistant.const import (
 class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
     def __init__(self):
         """Initialize."""
-        self.data_schema = CONFIG_SCHEMA_A
+        self.data_schema = CONFIG_SCHEMA_MAIN
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         #if self._async_current_entries():
         #    return self.async_abort(reason="single_instance_allowed")
 
         if not user_input:
-            return self._show_form()
+            return self._show_form("user")
 
         username = user_input[CONF_USERNAME]
         ipaddress = user_input[CONF_IP_ADDRESS]
@@ -51,16 +51,43 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             #    return self._show_form({"base": "invalid_credentials"})
             return self._show_form({"base": "connection_error"})
         
+        #Save the current data set
+        self.user_input = user_input
+#        return self.async_create_entry(
+#            title=user_input[OID_HOSTNAME],
+#            data=user_input
+#        )
+        return await self.async_step_interfaces()
+
+    async def async_step_interfaces(self,user_input2 = None):
+        """Second page of the flow."""
+
+        if not user_input2:
+            return self._show_form("interfaces")
+
+        interfacetest = user_input["interfaces"]
+                        
+        try:
+            #We only need to get this information once, so get it as part of the connection test and add it to user_input
+            test = "test"
+            
+        except:
+            e = traceback.format_exc()
+            LOGGER.error("Error on Interface form: %s", e)
+            #if ex.errcode == 400:
+            #    return self._show_form({"base": "invalid_credentials"})
+            return self._show_form({"base": "connection_error"})
+        
         return self.async_create_entry(
             title=user_input[OID_HOSTNAME],
             data=user_input
         )
-
+       
     @callback
-    def _show_form(self, errors=None):
+    def _show_form(self, step_id,errors=None):
         """Show the form to the user."""
         return self.async_show_form(
-            step_id="user",
+            step_id=step_id,
             data_schema=self.data_schema,
             errors=errors if errors else {},
         )
