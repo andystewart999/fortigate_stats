@@ -16,7 +16,9 @@
                     "scan_interval": "Scan interval (seconds)",
 					"cpu_and_ram": "Monitor CPU and RAM usage",
 					"disk": "Monitor disk usage",
-					"sessions": "Monitor session count"
+					"sessions": "Monitor session count",
+					"include_interfaces": "Interfaces (next page)",
+					"include_performanceslas": "Performance SLAs (next page"
                 },
                 "title": "Enter firewall details"
             },
@@ -25,6 +27,12 @@
                     "interfaces": "Select interfaces"
                 },
                 "title": "Firewall interfaces"
+            },
+            "performanceslas": {
+                "data": {
+                    "performanceslas": "Select performance SLAs"
+                },
+                "title": "Performance SLAs"
             }
         },
         "title": "Fortigate Stats"

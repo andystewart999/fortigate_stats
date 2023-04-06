@@ -57,8 +57,14 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
 #            title=user_input[OID_HOSTNAME],
 #            data=user_input
 #        )
-        self.data_schema = CONFIG_SCHEMA_INTERFACES
-        return await self.async_step_interfaces()
+
+        if user_input["include_interfaces"]:
+            self.data_schema = CONFIG_SCHEMA_INTERFACES
+            return await self.async_step_interfaces()
+        elseif user_input["include_performanceslas"]:
+            return await self.async_step_performanceslas()
+            
+            #### ADD PERFORMANCESLAS CLASS
 
     async def async_step_interfaces(self,user_input2 = None):
         """Second page of the flow."""
