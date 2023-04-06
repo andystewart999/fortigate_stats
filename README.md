@@ -1,11 +1,14 @@
-# Fortigate Stats (alpha 02042212)
+# Fortigate Stats
 Home Assistant integration to show statistics from a FortiGate firewall, via SNMP
 - CPU, RAM and Disk usage
 - Session count
+
+To-do:
+- Per-interface bandwidth usage sensors for user-selected interfaces 
 - Estimated uplink bandwidth and health (if a performance SLA is enabled)
 
 Tested working with FortiOS 6.2.11
 
-With thanks to [weltmeyer](https://github.com/weltmeyer) and [wxt9861](https://github.com/wxt9861) for doing 99.9% of the heavy lifting!
+With thanks to [weltmeyer](https://github.com/weltmeyer) and [wxt9861](https://github.com/wxt9861) for doing 99% of the heavy lifting!
 
-<b>Note this is currently in alpha stage and non-functional!
+This is my first full Python hobbyist/testbed project and it's a work-in-progress... I'm sure there are many optimisations and improvements that could be made, feel free to comment.
