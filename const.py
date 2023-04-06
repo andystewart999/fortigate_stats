@@ -9,6 +9,8 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_PORT
 )
+CONF_INTERFACES = "interfaces"
+
 LOGGER = logging.getLogger(__package__)
 
 DOMAIN = "fortigate_stats"

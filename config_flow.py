@@ -45,7 +45,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                 user_input[OID_FORTIOS] = oidReturn[3][1].prettyPrint()
             
         except:
-            e = traceback.format_exc()
+            e = traceback.format_exec()
             LOGGER.error("Unable to connect to snmp: %s", e)
             #if ex.errcode == 400:
             #    return self._show_form({"base": "invalid_credentials"})
@@ -57,6 +57,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
 #            title=user_input[OID_HOSTNAME],
 #            data=user_input
 #        )
+        self.data_schema = CONFIG_SCHEMA_INTERFACES
         return await self.async_step_interfaces()
 
     async def async_step_interfaces(self,user_input2 = None):
@@ -65,7 +66,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         if not user_input2:
             return self._show_form("interfaces")
 
-        interfacetest = user_input["interfaces"]
+        interfacetest = user_input2["interfaces"]
                         
         try:
             #We only need to get this information once, so get it as part of the connection test and add it to user_input
