@@ -1,4 +1,3 @@
-import random #NOT NEEDED AFTER TESTING IS DONE
 from pysnmp import hlapi
 from pysnmp.error import PySnmpError
 import time
@@ -8,6 +7,8 @@ import sys
 
 # pylint: disable=unused-wildcard-import
 from .const import * 
+from .snmp import snmp_getnext
+
 # pylint: enable=unused-wildcard-import
 import threading
 import time
@@ -142,6 +143,7 @@ class SnmpStatisticsMonitor:
         self.stat_time=0
         self.username=config_entry.data.get(CONF_USERNAME)
         self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
+        self.port=config_entry.data.get(CONF_PORT)
         self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
         self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
         self.include_disk=config_entry.data.get("disk")
@@ -246,8 +248,17 @@ class SnmpStatisticsMonitor:
                 OID_DISKCAPACITY,
                 ],hlapi.CommunityData(self.username))
 
-            self.disk_usage = (snmp_data[OID_DISKUSAGE] / snmp_data[OID_DISKCAPACITY]) * 100
+            self.disk_usage = int((snmp_data[OID_DISKUSAGE] / snmp_data[OID_DISKCAPACITY])) * 100
 
+        if self.include_sessions:
+            snmp_data = snmp_getnext(self.target_ip, self.username, self.port, OID_SESSIONCOUNT)
+            sessioncount = 0
+            for oid_entry in snmp_data:
+                for oid, oid_value in oid_entry:
+                    sessioncount = sessioncount + val(oid_value.prettyPrint())
+            
+            self.sessions = sessioncount
+        
     def update_netif_stats(self):
         if_data=self.current_if_data
         its = __class__.get_bulk_auto(self.target_ip, [
@@ -424,8 +435,8 @@ class SnmpStatisticsMonitor:
         if self.include_disk:
             self._AddOrUpdateEntity(allSensorsPrefix+"disk_usage","Disk usage",self.disk_usage,'%',"mdi:database")
         
-#       if self.include_sessions:
-#            self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'%',"mdi:database")
+       if self.include_sessions:
+            self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'%',"mdi:format-list-bulleted-type")
             
             
         #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')

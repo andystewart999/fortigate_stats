@@ -19,8 +19,13 @@ OID_HOSTNAME = '1.3.6.1.2.1.1.5.0'
 OID_SERIALNUMBER = '1.3.6.1.4.1.12356.100.1.1.1.0'
 OID_FORTIOS = '1.3.6.1.4.1.12356.101.4.1.1.0'
 OID_MODEL = '1.3.6.1.4.1.12356.101.13.2.1.1.2.1'
+
 OID_CPUUSAGE = '1.3.6.1.4.1.12356.101.4.1.3.0'
 OID_RAMUSAGE = '1.3.6.1.4.1.12356.101.4.1.4.0'
+OID_DISKUSAGE = '1.3.6.1.4.1.12356.101.4.1.6.0'
+OID_DISKCAPACITY = '1.3.6.1.4.1.12356.101.4.1.7.0'
+
+OID_SESSIONCOUNT = '1.3.6.1.4.1.12356.101.4.5.3.1.8'
 
 CONFIG_SCHEMA_A=vol.Schema(
             {
@@ -40,16 +45,3 @@ CONFIG_SCHEMA = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
-
-
-#def flattenObj(prefix,seperator,obj):
-#    result={}
-#    for field in obj:
-#        val=obj[field]
-#        valprefix=prefix+seperator+field
-#        if type(val) is dict:
-#            sub=flattenObj(valprefix,seperator,val)
-#            result.update(sub)
-#        else:
-#            result[valprefix]=val
-#    return result

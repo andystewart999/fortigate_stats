@@ -1,4 +1,3 @@
-#from .sensor import SnmpStatisticsMonitor
 from .snmp import snmp_getmulti
 import traceback
 import logging
@@ -31,13 +30,12 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             return self._show_form()
 
         username = user_input[CONF_USERNAME]
-        ipaddress= user_input[CONF_IP_ADDRESS]
-        port= user_input[CONF_PORT]
+        ipaddress = user_input[CONF_IP_ADDRESS]
+        port = user_input[CONF_PORT]
                         
         try:
             #We only need to get this information once, so get it as part of the connection test and add it to user_input
             oids = (OID_HOSTNAME, OID_SERIALNUMBER, OID_MODEL,OID_FORTIOS)
-            LOGGER.error ("calling snmp_getmulti")
             oidReturn = snmp_getmulti(ipaddress, username, port, oids)
             user_input[OID_HOSTNAME] = oidReturn[0][1].prettyPrint()
             user_input[OID_SERIALNUMBER] = oidReturn[1][1].prettyPrint()
