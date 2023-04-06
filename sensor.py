@@ -27,10 +27,6 @@ from homeassistant.const import (
 async def async_setup_entry(hass, config_entry,async_add_entities):
     """Set up the sensor platform."""
     LOGGER.error('SETUP_ENTRY')
-    #username=config_entry.data.get(CONF_USERNAME)
-    #password=config_entry.data.get(CONF_PASSWORD)
-    #ipaddress=config_entry.data.get(CONF_IP_ADDRESS)
-    #updateIntervalSeconds=config_entry.options.get(CONF_SCAN_INTERVAL)
     maxretries=3
     
     for i in range(maxretries):
@@ -40,8 +36,7 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
         except:
             if i==maxretries-1:
                 raise
-
-        
+       
     hass.data[DOMAIN][config_entry.entry_id]={"monitor":monitor}
     
     
@@ -58,8 +53,6 @@ class SnmpStatisticsSensor(Entity):
     def __init__(self,id,fw_info,name=None,unit=None,icon=None):
         self._attributes = {}
         self._state ="NOTRUN"
-        LOGGER.error("fw_info (60): " + fw_info[OID_SERIALNUMBER])
-        self.serialnumber=fw_info[OID_SERIALNUMBER]
         self.fw_info = fw_info
         self.entity_id=id
         if name is None:
@@ -69,7 +62,7 @@ class SnmpStatisticsSensor(Entity):
             self._unitofmeasurement=unit
         if icon is None:
             icon = "mdi:eye"
-        self.icon = icon
+        self._icon = icon
             
         LOGGER.info("Create Sensor {0}".format(id))
 
@@ -88,9 +81,9 @@ class SnmpStatisticsSensor(Entity):
     @property
     def icon(self):
         """Return the icon to be used for this entity."""
-        return self.icon 
- 
- @property
+        return self._icon
+
+    @property
     def unique_id(self) -> str:
         """Return the unique ID for this sensor."""
         return self.entity_id
@@ -130,7 +123,6 @@ class SnmpStatisticsSensor(Entity):
 #            indentifier = {(DOMAIN, self.config["host"].replace(".", "_"))}
 #        else:
         identifier = {(DOMAIN, self.fw_info[OID_SERIALNUMBER])}
-        #identifier = {(DOMAIN, self.serialnumber)}
         return {
             "identifiers": identifier,
             "name": self.fw_info[OID_HOSTNAME],
@@ -149,15 +141,9 @@ class SnmpStatisticsMonitor:
         self.current_if_data_time=0
         self.stat_time=0
         self.username=config_entry.data.get(CONF_USERNAME)
-        LOGGER.error("config entry data get (CONF_USERNAME)")
-        LOGGER.error(self.username)
         self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
-        LOGGER.error("config entry data get (CONF_IP_ADDRESS)")
-        LOGGER.error(self.target_ip)
         self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
         self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
-        LOGGER.error ("config_entry.data.get(cpu_and_ram)")
-        LOGGER.error(config_entry.data.get("cpu_and_ram"))
         self.include_disk=config_entry.data.get("disk")
         self.include_sessions=config_entry.data.get("sessions")
         self.cpu_usage=None
@@ -168,7 +154,8 @@ class SnmpStatisticsMonitor:
         self.fw_info = {
             OID_HOSTNAME: config_entry.data.get(OID_HOSTNAME),
             OID_SERIALNUMBER: config_entry.data.get(OID_SERIALNUMBER),
-            OID_MODEL: config_entry.data.get(OID_MODEL)
+            OID_MODEL: config_entry.data.get(OID_MODEL),
+            OID_FORTIOS: config_entry.data.get(OID_FORTIOS)
             }
         self.update_stats()#try this to throw error if not working.
         if async_add_entities is not None:
@@ -244,39 +231,22 @@ class SnmpStatisticsMonitor:
     #endregion
     def update_stats(self):
         #self.update_netif_stats()
-#        fw_stats=__class__.get(self.target_ip,[
-#            OID_CPUUSAGE,
-#            OID_RAMUSAGE,
-#            ],hlapi.CommunityData(self.username))
-        
-        fw_stats = {
-            OID_CPUUSAGE: random.randint(0,100),
-            OID_RAMUSAGE: random.randint(0,100),
-            }
-        
-        #hostname, serialnumber, cpu usage, ram usage    
-        #cpu usage://1.3.6.1.2.1.25.3.3[.1...4]
-        #cpu_usages= __class__.get_bulk(self.target_ip, [
-        #    '1.3.6.1.2.1.25.3.3',
-        #], hlapi.CommunityData('public', mpModel=1), 
-        #    32 
-        #)
+        if self.include_cpu_and_ram:
+            snmp_data=__class__.get(self.target_ip,[
+                OID_CPUUSAGE,
+                OID_RAMUSAGE,
+                ],hlapi.CommunityData(self.username))
 
-        
-        #print(more_data)
-        #print(more_data['1.3.6.1.4.1.2021.10.1.1'])
-        #print(more_data['1.3.6.1.2.1.1.5.0'])
-        #for k,v in more_data:
-        #    print(f"{k}:{v}")
-        
-        #TESTING THIS APPROACH
-        self.fw_stats = fw_stats                                
-        LOGGER.error ("fw_stats: " + str(fw_stats[OID_CPUUSAGE]))
-        LOGGER.error ("_fw_stats: " + str(self.fw_stats[OID_RAMUSAGE]))
-        
-        self.cpu_usage=fw_stats[OID_CPUUSAGE]
-        self.ram_usage=fw_stats[OID_RAMUSAGE]
-        #self.cpuload3=more_data['1.3.6.1.4.1.2021.10.1.3.3']
+        self.cpu_usage=snmp_data[OID_CPUUSAGE]
+        self.ram_usage=snmp_data[OID_RAMUSAGE]
+
+        if self.include_disk:
+            snmp_data=__class__.get(self.target_ip,[
+                OID_DISKUSAGE,
+                OID_DISKCAPACITY,
+                ],hlapi.CommunityData(self.username))
+
+            self.disk_usage = (snmp_data[OID_DISKUSAGE] / snmp_data[OID_DISKCAPACITY]) * 100
 
     def update_netif_stats(self):
         if_data=self.current_if_data
@@ -396,19 +366,14 @@ class SnmpStatisticsMonitor:
             self.AddOrUpdateEntities()
 
     
-    def _AddOrUpdateEntity(self,id,friendlyname,value,unit):
+    def _AddOrUpdateEntity(self,id,friendlyname,value,unit,icon):
         if id in self.meterSensors:
             sensor=self.meterSensors[id]
-            LOGGER.error("setting attributes 1: unit=")
             sensor.set_attributes({"other_thing":"othertest"})
-            LOGGER.error("updating state")
             sensor.set_state(value)
         else:
-            LOGGER.error("id is not in list")
-            LOGGER.error("fw_info (399): " + self.fw_info[OID_SERIALNUMBER])
-            sensor=SnmpStatisticsSensor(id,self.fw_info,friendlyname,unit)
+            sensor=SnmpStatisticsSensor(id,self.fw_info,friendlyname,unit,icon)
             sensor._state=value
-            LOGGER.error("setting attributes 2: unit=")
             sensor.set_attributes(
                     {
                         "made_up_thing":"test"
@@ -452,10 +417,17 @@ class SnmpStatisticsMonitor:
 
 
 
-        self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpu_usage,'%',"mdi:cpu-64-bit")
-        
-        if self.include_sessions:
+        if self.include_cpu_and_ram:
+            self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpu_usage,'%',"mdi:memory")
             self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage,'%',"mdi:memory")
+
+        if self.include_disk:
+            self._AddOrUpdateEntity(allSensorsPrefix+"disk_usage","Disk usage",self.disk_usage,'%',"mdi:database")
+        
+#       if self.include_sessions:
+#            self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'%',"mdi:database")
+            
+            
         #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
         
 
