@@ -27,7 +27,6 @@ from homeassistant.const import (
 
 async def async_setup_entry(hass, config_entry,async_add_entities):
     """Set up the sensor platform."""
-    LOGGER.error('SETUP_ENTRY')
     maxretries=3
     
     for i in range(maxretries):
@@ -65,7 +64,7 @@ class SnmpStatisticsSensor(Entity):
             icon = "mdi:eye"
         self._icon = icon
             
-        LOGGER.info("Create Sensor {0}".format(id))
+        LOGGER.info("Created sensor {0}".format(id))
 
     def set_state(self, state):
         """Set the state."""
@@ -114,7 +113,7 @@ class SnmpStatisticsSensor(Entity):
         """Return the name of the sensor."""
         return self._name
     def update(self):
-        LOGGER.info("update "+self.entity_id)
+        LOGGER.info("Updated "+self.entity_id)
 
     #Speculative
     @property
@@ -359,13 +358,12 @@ class SnmpStatisticsMonitor:
 
         while not self.stopped:
             try:
-                #LOGGER.warning('Get PowerMeters: ')
                 self.update_stats()
                 if self.async_add_entities is not None:
                     self.AddOrUpdateEntities()
             except (KeyError,PySnmpError):
-                time.sleep(1)#sleep a second for these errors
-            except:#other errors get logged...
+                time.sleep(1)
+            except:
                 e = traceback.format_exc()
                 LOGGER.error(e)
             if self.updateIntervalSeconds is None:
@@ -383,23 +381,25 @@ class SnmpStatisticsMonitor:
     def _AddOrUpdateEntity(self,id,friendlyname,value,unit,icon):
         if id in self.meterSensors:
             sensor=self.meterSensors[id]
-            sensor.set_attributes({"other_thing":"othertest"})
+#            sensor.set_attributes({"First attribute":"Goes here"})
             sensor.set_state(value)
         else:
             sensor=SnmpStatisticsSensor(id,self.fw_info,friendlyname,unit,icon)
             sensor._state=value
-            sensor.set_attributes(
-                    {
-                        "made_up_thing":"test"
-                    }
-                )
-            LOGGER.error("adding entity")
+#            sensor.set_attributes(
+#                    {
+#                        "First attribute":"Goes here"
+#                    }
+#                )
             self.async_add_entities([sensor])
             #time.sleep(.5)#sleep a moment and wait for async add
             self.meterSensors[id]=sensor
         
     def AddOrUpdateEntities(self):
         allSensorsPrefix = "sensor." + DOMAIN + "_" + self.fw_info[OID_SERIALNUMBER].replace('.','_') + "_"
+        
+        #TODO - use the code below as a basis for per-interface sensors
+        
         # for k in self.current_if_data:
             # cur_if_data=self.current_if_data[k]
             # if_name=cur_if_data['name2']
@@ -441,8 +441,4 @@ class SnmpStatisticsMonitor:
         if self.include_sessions:
             self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'sessions',"mdi:format-list-bulleted-type")
             
-            
-        #self._AddOrUpdateEntity(allSensorsPrefix+"cpu_load_3","CPU Avg 3",self.cpuload3*100,'%')
-        
-
 

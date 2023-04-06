@@ -7,7 +7,7 @@ To-do:
 - Per-interface bandwidth usage sensors for user-selected interfaces 
 - Estimated uplink bandwidth and health (if a performance SLA is enabled)
 
-Tested working with FortiOS 6.2.11
+Tested and working with FortiOS 6.2.11 on a Fortigate 100D
 
 With thanks to [weltmeyer](https://github.com/weltmeyer) and [wxt9861](https://github.com/wxt9861) for doing 99% of the heavy lifting!
 

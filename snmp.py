@@ -1,7 +1,7 @@
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 import logging
 
-_LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 def snmp_get(host, user, port, oid):
     # connect and get data from host

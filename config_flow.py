@@ -67,9 +67,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
 
     async def async_step_import(self, import_config):
         """Import a config entry from configuration.yaml."""
-        #if self._async_current_entries():
-        #    LOGGER.warning("Only one configuration of abode is allowed.")
-        #    return self.async_abort(reason="single_instance_allowed")
 
         return await self.async_step_user(import_config)
     @staticmethod
