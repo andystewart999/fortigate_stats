@@ -1,32 +1,34 @@
 {
     "config": {
         "abort": {
-            "single_instance_allowed": "Es ist nur eine einzige Konfiguration von snmp_stats erlaubt."
+            "single_instance_allowed": "Es kann nur eine einzige Instanz dieser Integration hinzugefügt werden."
         },
         "error": {
-            "connection_error": "Es kann keine Verbindung zum SNMP-Service hergestellt werden.",
-            "identifier_exists": "Das Konto ist bereits registriert.",
-            "invalid_credentials": "Ung\u00fcltige Anmeldeinformationen"
+            "connection_error": "Verbindung über SNMP nicht möglich.",
+            "identifier_exists": "Die Kennung existiert bereits.",
+            "invalid_credentials": "Ungültige Anmeldeinformationen."
         },
         "step": {
             "user": {
                 "data": {
-                    "password": "Passwort",
-                    "username": "Nutzername(user/installer)",
-                    "ip_address": "IP-Adresse",
-                    "scan_interval": "Aktualisierungsinterval(Sekunden)"
+                    "username": "Gemeinschaftszeichenfolge",
+                    "ip_address": "IP Adresse",
+                    "scan_interval": "Scanintervall (Sekunden)",
+					"cpu_and_ram": "Überwachen Sie die CPU- und RAM-Auslastung",
+					"disk": "Überwachen Sie die Festplattennutzung",
+					"sessions": "Sitzungsanzahl überwachen"
                 },
-                "title": "Gib deine SNMP-Anmeldeinformationen ein"
+                "title": "Geben Sie Firewall-Details ein"
             }
             
         },
-        "title": "SNMP Stats"
+        "title": "Fortigate stats"
     },
     "options":{
         "step":{
             "init":{
                 "data":{
-                    "scan_interval": "Aktualisierungsinterval(Sekunden)"
+                    "scan_interval": "Scanintervall (Sekunden)"
                 }
             }
         }
