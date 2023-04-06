@@ -6,7 +6,7 @@
         "error": {
             "connection_error": "Unable to connect via SNMP.",
             "identifier_exists": "The identifier already exists.",
-            "invalid_credentials": "Invalid credentials"
+            "invalid_credentials": "Invalid credentials."
         },
         "step": {
             "user": {
