@@ -16,7 +16,7 @@
                     "scan_interval": "Scan interval (seconds)",
 					"cpu_and_ram": "Monitor CPU and RAM usage",
 					"disk": "Monitor disk usage",
-					"sessions": "Monitor session count".
+					"sessions": "Monitor session count",
 					"interfacesyesno": "Show per-interface bandwidth usage",
 					"performanceslasyesno": "Show performance SLA information"
                 },
