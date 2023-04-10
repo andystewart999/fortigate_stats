@@ -9,8 +9,10 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_PORT
 )
+CONF_INTERFACESYESNO = "interfacesyesno"
 CONF_INTERFACES = "interfaces"
-CONF_PERFORMANECSLAS = "performanceslas"
+CONF_PERFORMANCESLASYESNO = "performanceslasyesno"
+CONF_PERFORMANCESLAS = "performanceslas"
 
 LOGGER = logging.getLogger(__package__)
 
@@ -39,8 +41,8 @@ CONFIG_SCHEMA_MAIN=vol.Schema(
                 vol.Required("disk"): bool,
                 vol.Required("sessions"): bool,
                 vol.Optional(CONF_SCAN_INTERVAL, default=10): int,
-                vol.Optional("include_interfaces", default = False): bool,
-                vol.Optional("include_performanceslas", default = False): bool
+                vol.Optional(CONF_INTERFACES_YESNO, default = True): bool,
+                vol.Optional(CONF_PERFORMANCESLAS_YESNO, default = True): bool
             }
 )
 
@@ -50,11 +52,12 @@ CONFIG_SCHEMA_INTERFACES=vol.Schema(
             }
 )
 
-CONFIG_SCHEMA_PERFORMANCESLAS=vol.Schema(
+CONFIG_SCHEMA_INTERFACES=vol.Schema(
             {
                 vol.Required(CONF_PERFORMANCESLAS): str
             }
 )
+
 #CONFIG_SCHEMA = vol.Schema(
 #    {
 #        DOMAIN: CONFIG_SCHEMA_A
