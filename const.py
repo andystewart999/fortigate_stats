@@ -9,7 +9,10 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_PORT
 )
+CONF_INTERFACESYESNO = "interfacesyesno"
 CONF_INTERFACES = "interfaces"
+CONF_PERFORMANCESLASYESNO = "performanceslasyesno"
+CONF_PERFORMANCESLAS = "performanceslas"
 
 LOGGER = logging.getLogger(__package__)
 
@@ -37,13 +40,21 @@ CONFIG_SCHEMA_MAIN=vol.Schema(
                 vol.Required("cpu_and_ram"): bool,
                 vol.Required("disk"): bool,
                 vol.Required("sessions"): bool,
-                vol.Optional(CONF_SCAN_INTERVAL, default=10): int
+                vol.Optional(CONF_SCAN_INTERVAL, default=10): int,
+                vol.Optional(CONF_INTERFACES_YESNO, default = True): bool,
+                vol.Optional(CONF_PERFORMANCESLAS_YESNO, default = True): bool
             }
 )
 
 CONFIG_SCHEMA_INTERFACES=vol.Schema(
             {
                 vol.Required(CONF_INTERFACES): str
+            }
+)
+
+CONFIG_SCHEMA_INTERFACES=vol.Schema(
+            {
+                vol.Required(CONF_PERFORMANCESLAS): str
             }
 )
 

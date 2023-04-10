@@ -53,12 +53,19 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         
         #Save the current data set
         self.user_input = user_input
-#        return self.async_create_entry(
-#            title=user_input[OID_HOSTNAME],
-#            data=user_input
-#        )
-        self.data_schema = CONFIG_SCHEMA_INTERFACES
-        return await self.async_step_interfaces()
+
+        # Do we need to show the next flow forms?
+        if user_input[CONF_INTERFACESYESNO]:
+            self.data_schema = CONFIG_SCHEMA_INTERFACES
+            return await self.async_step_interfaces()
+        elif user_input[CONF_PERFORMANCESLASYESNO]:
+            self.data_schema = CONFIG_SCHEMA_PERFORMANCESLAS
+            return await self.async_step_performanceslas()
+        else:
+            return self.async_create_entry(
+                title=user_input[OID_HOSTNAME],
+                data=user_input
+            )
 
     async def async_step_interfaces(self,user_input2 = None):
         """Second page of the flow."""
@@ -67,25 +74,66 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             return self._show_form("interfaces")
 
         interfacetest = user_input2["interfaces"]
+        LOGGER.error ("interfacetest")
+        LOGGER.error (interfacetest)
                         
         try:
             #We only need to get this information once, so get it as part of the connection test and add it to user_input
             test = "test"
             
         except:
-            e = traceback.format_exc()
+            e = traceback.format_exec()
             LOGGER.error("Error on Interface form: %s", e)
             #if ex.errcode == 400:
             #    return self._show_form({"base": "invalid_credentials"})
             return self._show_form({"base": "connection_error"})
         
+        user_input_combined = self.user_input | user_input2 
+        self.user_input = user_input_combined
+        LOGGER.error("OID_HOSTNAME")
+        LOGGER.error(self.user_input[OID_HOSTNAME])
+
+        # Do we need to show the next flow forms?
+        if user_input[CONF_PERFORMANCESLASYESNO]:
+            self.data_schema = CONFIG_SCHEMA_PERFORMANCESLAS
+            return await self.async_step_performanceslas()
+        else:
+            return self.async_create_entry(
+                title=user_input[OID_HOSTNAME],
+                data=user_input
+            )
+    
+        async def async_step_performanceslas(self,user_input3 = None):
+        """Second page of the flow."""
+
+        if not user_input3:
+            return self._show_form("performanceslas")
+
+        performanceslas = user_input3["performanceslas"]
+        LOGGER.error ("performanceslas")
+        LOGGER.error (performanceslas)
+                        
+        try:
+            #We only need to get this information once, so get it as part of the connection test and add it to user_input
+            test2 = "test2"
+            
+        except:
+            e = traceback.format_exec()
+            LOGGER.error("Error on Interface form: %s", e)
+            #if ex.errcode == 400:
+            #    return self._show_form({"base": "invalid_credentials"})
+            return self._show_form({"base": "connection_error"})
+        
+        user_input_combined = self.user_input | user_input3 
+        LOGGER.error("OID_HOSTNAME")
+        LOGGER.error(self.user_input[OID_HOSTNAME])
         return self.async_create_entry(
-            title=user_input[OID_HOSTNAME],
-            data=user_input
+            title=self.user_input[OID_HOSTNAME],
+            data=user_input_combined
         )
-       
+
     @callback
-    def _show_form(self, step_id,errors=None):
+    def _show_form(self, step_id,errors = None):
         """Show the form to the user."""
         return self.async_show_form(
             step_id=step_id,
