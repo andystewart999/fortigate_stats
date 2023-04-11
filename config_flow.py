@@ -73,12 +73,12 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         if not user_input2:
             return self._show_form("interfaces")
 
-        interfacetest = user_input2["interfaces"]
+        interfacetest = user_input2[CONF_INTERFACES]
         LOGGER.error ("interfacetest")
         LOGGER.error (interfacetest)
                         
         try:
-            #We only need to get this information once, so get it as part of the connection test and add it to user_input
+            #Checks here
             test = "test"
             
         except:
@@ -90,7 +90,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         
         user_input_combined = self.user_input | user_input2 
         self.user_input = user_input_combined
-        LOGGER.error("OID_HOSTNAME")
+        LOGGER.error("OID_HOSTNAME via Interfaces page")
         LOGGER.error(self.user_input[OID_HOSTNAME])
 
         # Do we need to show the next flow forms?
