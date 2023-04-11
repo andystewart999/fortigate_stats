@@ -103,7 +103,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                 data=user_input
             )
     
-        async def async_step_performanceslas(self,user_input3 = None):
+    async def async_step_performanceslas(self,user_input3 = None):
         """Second page of the flow."""
 
         if not user_input3:
