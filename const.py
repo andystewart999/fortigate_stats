@@ -13,6 +13,9 @@ CONF_INTERFACESYESNO = "interfacesyesno"
 CONF_INTERFACES = "interfaces"
 CONF_PERFORMANCESLASYESNO = "performanceslasyesno"
 CONF_PERFORMANCESLAS = "performanceslas"
+CONF_PERFORMANCESLASLINKMETRICS = "performanceslasnetworkmetrics"
+CONF_PERFORMANCESLASBANDWIDTHPROBE = "performanceslasbandwidthprobe"
+CONF_PERFORMANCESLASSTATE = "performanceslasstate"
 
 LOGGER = logging.getLogger(__package__)
 
@@ -32,6 +35,18 @@ OID_DISKCAPACITY = '1.3.6.1.4.1.12356.101.4.1.7.0'
 
 OID_SESSIONCOUNT = '1.3.6.1.4.1.12356.101.4.5.3.1.8'
 
+OID_PERFORMANCESLALINKNAME = '1.3.6.1.4.1.12356.101.4.9.2.1.2'
+OID_PERFORMANCESLALINKSTATE = '1.3.6.1.4.1.12356.101.4.9.2.1.4'
+OID_PERFORMANCESLALINKLATENCY = '1.3.6.1.4.1.12356.101.4.9.2.1.5'
+OID_PERFORMANCESLALINKJITTER = '1.3.6.1.4.1.12356.101.4.9.2.1.6'
+OID_PERFORMANCESLALINKPACKETLOSS = '1.3.6.1.4.1.12356.101.4.9.2.1.9'
+OID_PERFORMANCESLALINKBANDWIDTHIN = '1.3.6.1.4.1.12356.101.4.9.2.1.11'
+OID_PERFORMANCESLALINKBANDWIDTHOUT = '1.3.6.1.4.1.12356.101.4.9.2.1.12'
+
+OID_IFSTATUS = '1.3.6.1.2.1.2.2.1.8'
+OID_IFNAME = '1.3.6.1.2.1.31.1.1.1.1'
+OID_IFALIAS = '1.3.6.1.2.1.31.1.1.1.18'
+
 CONFIG_SCHEMA_MAIN=vol.Schema(
             {
                 vol.Required(CONF_USERNAME): str,
@@ -43,18 +58,6 @@ CONFIG_SCHEMA_MAIN=vol.Schema(
                 vol.Optional(CONF_SCAN_INTERVAL, default=10): int,
                 vol.Optional(CONF_INTERFACESYESNO, default = True): bool,
                 vol.Optional(CONF_PERFORMANCESLASYESNO, default = True): bool
-            }
-)
-
-CONFIG_SCHEMA_INTERFACES=vol.Schema(
-            {
-                vol.Required(CONF_INTERFACES): str
-            }
-)
-
-CONFIG_SCHEMA_INTERFACES=vol.Schema(
-            {
-                vol.Required(CONF_PERFORMANCESLAS): str
             }
 )
 

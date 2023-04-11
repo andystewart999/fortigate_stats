@@ -152,6 +152,7 @@ class SnmpStatisticsMonitor:
         self.disk_usage=None
         self.sessions=None
         self.cpuload3=None
+                
         self.fw_info = {
             OID_HOSTNAME: config_entry.data.get(OID_HOSTNAME),
             OID_SERIALNUMBER: config_entry.data.get(OID_SERIALNUMBER),
@@ -257,7 +258,7 @@ class SnmpStatisticsMonitor:
                 
                 for oid_entry in snmp_data:
                     for oid, oid_value in oid_entry:
-                        sessioncount = sessioncount + int(oid_value.prettyPrint())
+                        sessioncount += int(oid_value.prettyPrint())
             
             self.sessions = sessioncount
         

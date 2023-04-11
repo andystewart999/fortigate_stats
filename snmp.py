@@ -7,6 +7,7 @@ def snmp_get(host, user, port, oid):
     # connect and get data from host
     auth = cmdgen.CommunityData(user) ## More error trapping here!
     cmdGen = cmdgen.CommandGenerator()
+
     errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         auth, cmdgen.UdpTransportTarget((host, port)),
         cmdgen.MibVariable(oid),  
@@ -33,6 +34,7 @@ def snmp_getfromtable(host, user, port, oid):
     # connect and get data from host
     auth = cmdgen.CommunityData(user) ## More error trapping here!
     cmdGen = cmdgen.CommandGenerator()
+
     errorIndication, errorStatus, errorIndex, varTable = cmdGen.nextCmd(
         auth, cmdgen.UdpTransportTarget((host, port)),
         cmdgen.MibVariable(oid),  
@@ -46,6 +48,7 @@ def snmp_getmulti(host, user, port, oids):
     # connect and get data from host
     auth = cmdgen.CommunityData(user) ## More error trapping here!
     cmdGen = cmdgen.CommandGenerator()
+
     errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         auth, cmdgen.UdpTransportTarget((host, port)),
         *[cmdgen.MibVariable(oid) for oid in oids],  
@@ -53,3 +56,16 @@ def snmp_getmulti(host, user, port, oids):
     )
 
     return errorIndication, varBinds
+
+def snmp_getmultifromtable(host, user, port, oids):
+    # connect and get data from host
+    auth = cmdgen.CommunityData(user) ## More error trapping here!
+    cmdGen = cmdgen.CommandGenerator()
+    
+    errorIndication, errorStatus, errorIndex, varTable = cmdGen.nextCmd(
+        auth, cmdgen.UdpTransportTarget((host, port)),
+        *[cmdgen.MibVariable(oid) for oid in oids],
+        lookupMib=False,
+    )
+
+    return errorIndication, varTable 

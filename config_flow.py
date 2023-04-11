@@ -1,4 +1,4 @@
-from .snmp import snmp_getmulti
+from .snmp import snmp_getmulti, snmp_getfromtable, snmp_getmultifromtable
 import traceback
 import logging
 import voluptuous as vol
@@ -7,7 +7,6 @@ from homeassistant.core import callback
 # pylint: disable=unused-wildcard-import
 from .const import * # 
 # pylint: enable=unused-wildcard-import
-import voluptuous as vol
 from homeassistant.const import (
     CONF_PASSWORD,
     CONF_USERNAME,
@@ -20,14 +19,15 @@ from homeassistant.const import (
 class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
     def __init__(self):
         """Initialize."""
-        self.data_schema = CONFIG_SCHEMA_MAIN
+        #self.data_schema = CONFIG_SCHEMA_MAIN
+        
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         #if self._async_current_entries():
         #    return self.async_abort(reason="single_instance_allowed")
 
         if not user_input:
-            return self._show_form("user")
+            return self._show_form("user",CONFIG_SCHEMA_MAIN)
 
         username = user_input[CONF_USERNAME]
         ipaddress = user_input[CONF_IP_ADDRESS]
@@ -56,7 +56,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
 
         # Do we need to show the next flow forms?
         if user_input[CONF_INTERFACESYESNO]:
-            self.data_schema = CONFIG_SCHEMA_INTERFACES
             return await self.async_step_interfaces()
         elif user_input[CONF_PERFORMANCESLASYESNO]:
             self.data_schema = CONFIG_SCHEMA_PERFORMANCESLAS
@@ -71,10 +70,42 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         """Second page of the flow."""
 
         if not user_input2:
-            return self._show_form("interfaces")
+            #Prepare the form
+            #Read all connected interface names and aliases
+
+            username = self.user_input[CONF_USERNAME]
+            ipaddress = self.user_input[CONF_IP_ADDRESS]
+            port = self.user_input[CONF_PORT]
+            
+            oids = (OID_IFSTATUS, OID_IFNAME, OID_IFALIAS)
+
+            errorIndication, snmp_data = snmp_getmultifromtable(ipaddress, username, port, oids)
+            if not errorIndication:
+                CONNECTED_INTERFACES = {}
+                for status, name, alias in snmp_data:
+                    if ( status[1] == 1):
+                        #Include it in the list
+                        #Get the right name
+                        if ( alias[1].prettyPrint() != ""):
+                            final_name = alias[1].prettyPrint()
+                        else:
+                            final_name = name[1].prettyPrint()
+
+                        #Add it
+                        CONNECTED_INTERFACES[name[0].prettyPrint()] = final_name
+                            
+            return self._show_form(
+                step_id = "interfaces",
+                data_schema = vol.Schema(
+                    {
+                        vol.Required(
+                            CONF_INTERFACES): cv.multi_select(CONNECTED_INTERFACES),
+                    }
+                ),
+            )
 
         interfacetest = user_input2[CONF_INTERFACES]
-        LOGGER.error ("interfacetest")
+        LOGGER.error ("CONF_INTERFACES")
         LOGGER.error (interfacetest)
                         
         try:
@@ -92,25 +123,54 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         self.user_input = user_input_combined
         LOGGER.error("OID_HOSTNAME via Interfaces page")
         LOGGER.error(self.user_input[OID_HOSTNAME])
+        LOGGER.error("CONF_INTERFACES via Interfaces page")
+        LOGGER.error(self.user_input[CONF_INTERFACES])
 
         # Do we need to show the next flow forms?
-        if user_input[CONF_PERFORMANCESLASYESNO]:
-            self.data_schema = CONFIG_SCHEMA_PERFORMANCESLAS
+        if self.user_input[CONF_PERFORMANCESLASYESNO]:
             return await self.async_step_performanceslas()
         else:
             return self.async_create_entry(
                 title=user_input[OID_HOSTNAME],
-                data=user_input
+                data=self.user_input
             )
     
     async def async_step_performanceslas(self,user_input3 = None):
         """Second page of the flow."""
 
         if not user_input3:
-            return self._show_form("performanceslas")
+            #Prepare the form
+            #Read all performance SLA link names
 
-        performanceslas = user_input3["performanceslas"]
-        LOGGER.error ("performanceslas")
+            username = self.user_input[CONF_USERNAME]
+            ipaddress = self.user_input[CONF_IP_ADDRESS]
+            port = self.user_input[CONF_PORT]
+
+            errorIndication, snmp_data = snmp_getfromtable(ipaddress, username, port, OID_PERFORMANCESLALINKNAME)
+            if not errorIndication:
+                PERFORMANCESLA_LINKS = {}
+                    for oid_entry in snmp_data:
+                        for oid, oid_value in oid_entry:
+                            PERFORMANCESLA_LINKS[oid] = oid_value.prettyPrint()
+                            
+            return self._show_form(
+                step_id = "performanceslas",
+                data_schema = vol.Schema(
+                    {
+                        vol.Required(
+                            CONF_PERFORMANCESLAS): cv.multi_select(PERFORMANCESLA_LINKS),
+                        vol.Required(
+                            CONF_PERFORMANCESLASSTATE): bool,
+                        vol.Required(
+                            CONF_PERFORMANCESLASLINKMETRICS): bool,
+                        vol.Required(
+                            CONF_PERFORMANCESLASBANDWIDTHPROBE): bool,
+                    }
+                ),
+            )
+
+        performanceslas = user_input3[CONF_PERFORMANCESLAS]
+        LOGGER.error ("CONF_PERFORMANCESLAS")
         LOGGER.error (performanceslas)
                         
         try:
@@ -124,20 +184,21 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             #    return self._show_form({"base": "invalid_credentials"})
             return self._show_form({"base": "connection_error"})
         
-        user_input_combined = self.user_input | user_input3 
-        LOGGER.error("OID_HOSTNAME")
+        user_input_combined = self.user_input | user_input3
+        self.user_input = user_input_combined
+        LOGGER.error("OID_HOSTNAME from performanceslas")
         LOGGER.error(self.user_input[OID_HOSTNAME])
         return self.async_create_entry(
             title=self.user_input[OID_HOSTNAME],
-            data=user_input_combined
+            data=self.user_input
         )
 
     @callback
-    def _show_form(self, step_id,errors = None):
+    def _show_form(self, step_id,data_schema,errors = None):
         """Show the form to the user."""
         return self.async_show_form(
             step_id=step_id,
-            data_schema=self.data_schema,
+            data_schema=data_schema,
             errors=errors if errors else {},
         )
 
