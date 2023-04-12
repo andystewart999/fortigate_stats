@@ -158,12 +158,7 @@ class SnmpStatisticsMonitor:
             self.include_performanceslasstate = config_entry.data.get(CONF_PERFORMANCESLASSTATE)
             self.include_performanceslaslinkmetrics = config_entry.data.get(CONF_PERFORMANCESLASLINKMETRICS)
             self.include_performanceslasbandwidthprobe = config_entry.data.get(CONF_PERFORMANCESLASBANDWIDTHPROBE)
-                
-            LOGGER.error("Reading performance SLAS dict")
-            for sla in self.performance_slas:
-                LOGGER.error(sla)
-                
-                
+          
         self.fw_info = {
             OID_HOSTNAME: config_entry.data.get(OID_HOSTNAME),
             OID_SERIALNUMBER: config_entry.data.get(OID_SERIALNUMBER),

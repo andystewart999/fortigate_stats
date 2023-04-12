@@ -104,8 +104,8 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             )
 
         interfacetest = user_input2[CONF_INTERFACES]
-        LOGGER.error ("CONF_INTERFACES")
-        LOGGER.error (interfacetest)
+        #LOGGER.error ("CONF_INTERFACES")
+        #LOGGER.error (interfacetest)
                         
         try:
             #Checks here
@@ -120,10 +120,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         
         user_input_combined = self.user_input | user_input2 
         self.user_input = user_input_combined
-        LOGGER.error("OID_HOSTNAME via Interfaces page")
-        LOGGER.error(self.user_input[OID_HOSTNAME])
-        LOGGER.error("CONF_INTERFACES via Interfaces page")
-        LOGGER.error(self.user_input[CONF_INTERFACES])
 
         # Do we need to show the next flow forms?
         if self.user_input[CONF_PERFORMANCESLASYESNO]:
@@ -169,8 +165,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             )
 
         performanceslas = user_input3[CONF_PERFORMANCESLAS]
-        LOGGER.error ("CONF_PERFORMANCESLAS")
-        LOGGER.error (performanceslas)
                         
         try:
             #We only need to get this information once, so get it as part of the connection test and add it to user_input
@@ -185,8 +179,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         
         user_input_combined = self.user_input | user_input3
         self.user_input = user_input_combined
-        LOGGER.error("OID_HOSTNAME from performanceslas")
-        LOGGER.error(self.user_input[OID_HOSTNAME])
         return self.async_create_entry(
             title=self.user_input[OID_HOSTNAME],
             data=self.user_input
