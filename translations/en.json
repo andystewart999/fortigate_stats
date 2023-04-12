@@ -20,13 +20,15 @@
 					"interfacesyesno": "Monitor per-interface bandwidth usage",
 					"performanceslasyesno": "Monitor performance SLA information"
                 },
-                "title": "Enter firewall details"
+                "title": "Enter firewall details",
+				"description": "Description goes here"
             },
             "interfaces": {
                 "data": {
                     "interfaces": "Select interfaces"
                 },
-                "title": "Firewall interfaces"
+                "title": "Firewall interfaces",
+				"description": "Description goes here"
             },
             "performanceslas": {
                 "data": {
@@ -35,7 +37,8 @@
 					"performanceslasnetworkmetrics": "Include network state metrics",
 					"performanceslasbandwidthprobe": "Include probe bandwidth metrics"
                 },
-                "title": "Performance SLAs"
+                "title": "Performance SLAs",
+				"description": "Description goes here"
             }
         },
         "title": "Fortigate Stats"

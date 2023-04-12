@@ -149,9 +149,9 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             errorIndication, snmp_data = snmp_getfromtable(ipaddress, username, port, OID_PERFORMANCESLALINKNAME)
             if not errorIndication:
                 PERFORMANCESLA_LINKS = {}
-                    for oid_entry in snmp_data:
-                        for oid, oid_value in oid_entry:
-                            PERFORMANCESLA_LINKS[oid] = oid_value.prettyPrint()
+                for oid_entry in snmp_data:
+                    for oid, oid_value in oid_entry:
+                        PERFORMANCESLA_LINKS[oid.prettyPrint()] = oid_value.prettyPrint()
                             
             return self._show_form(
                 step_id = "performanceslas",
