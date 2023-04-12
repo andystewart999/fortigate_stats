@@ -385,22 +385,18 @@ class SnmpStatisticsMonitor:
             self.AddOrUpdateEntities()
 
     
-    def _AddOrUpdateEntity(self,id,friendlyname,value,unit,icon):
+    def _AddOrUpdateEntity(self,id,friendlyname,value,unit,icon,attributes = None):
         if id in self.meterSensors:
             sensor=self.meterSensors[id]
-#            sensor.set_attributes({"First attribute":"Goes here"})
             sensor.set_state(value)
         else:
             sensor=SnmpStatisticsSensor(id,self.fw_info,friendlyname,unit,icon)
             sensor._state=value
-#            sensor.set_attributes(
-#                    {
-#                        "First attribute":"Goes here"
-#                    }
-#                )
             self.async_add_entities([sensor])
-            #time.sleep(.5)#sleep a moment and wait for async add
             self.meterSensors[id]=sensor
+            
+        if attributes is not None:
+            sensot.set_attributes (attributes)
         
     def AddOrUpdateEntities(self):
         allSensorsPrefix = "sensor." + DOMAIN + "_" + self.fw_info[OID_SERIALNUMBER].replace('.','_') + "_"
@@ -443,7 +439,14 @@ class SnmpStatisticsMonitor:
             self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage,'%',"mdi:memory")
 
         if self.include_disk:
-            self._AddOrUpdateEntity(allSensorsPrefix+"disk_usage","Disk usage",self.disk_usage,'%',"mdi:database")
+            #Attributes test
+            disk_attrs = (
+                {
+                    "Disk size":100,
+                    "Disk usage":99
+                }
+            )
+            self._AddOrUpdateEntity(allSensorsPrefix+"disk_usage","Disk usage",self.disk_usage,'%',"mdi:database", disk_attrs)
         
         if self.include_sessions:
             self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'sessions',"mdi:format-list-bulleted-type")

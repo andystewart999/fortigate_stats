@@ -28,7 +28,7 @@
                     "interfaces": "Select interfaces"
                 },
                 "title": "Firewall interfaces",
-				"description": "Description goes here"
+				"description": "Select which network interfaces to monitor.  Note that only currently connected interfaces are shown."
             },
             "performanceslas": {
                 "data": {
@@ -38,7 +38,7 @@
 					"performanceslasbandwidthprobe": "Include probe bandwidth metrics"
                 },
                 "title": "Performance SLAs",
-				"description": "Description goes here"
+				"description": "Select which performance SLAs to monitor, and the network metrics for each one."
             }
         },
         "title": "Fortigate Stats"

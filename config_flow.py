@@ -27,7 +27,22 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         #    return self.async_abort(reason="single_instance_allowed")
 
         if not user_input:
-            return self._show_form("user",CONFIG_SCHEMA_MAIN)
+            return self._show_form(
+                step_id = "user",
+                data_schema = vol.Schema(
+                    {
+                        vol.Required(CONF_USERNAME): str,
+                        vol.Required(CONF_IP_ADDRESS): str,
+                        vol.Optional(CONF_PORT, default = DEFAULT_PORT): int,
+                        vol.Required("cpu_and_ram"): bool,
+                        vol.Required("disk"): bool,
+                        vol.Required("sessions"): bool,
+                        vol.Optional(CONF_SCAN_INTERVAL, default = DEFAULT_SCAN_INTERVAL): int,
+                        vol.Optional(CONF_INTERFACESYESNO, default = False): bool,
+                        vol.Optional(CONF_PERFORMANCESLASYESNO, default = False): bool
+                    }
+                ),
+            )
 
         username = user_input[CONF_USERNAME]
         ipaddress = user_input[CONF_IP_ADDRESS]
@@ -103,7 +118,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                 ),
             )
 
-        interfacetest = user_input2[CONF_INTERFACES]
+        #interfacetest = user_input2[CONF_INTERFACES]
         #LOGGER.error ("CONF_INTERFACES")
         #LOGGER.error (interfacetest)
                         
