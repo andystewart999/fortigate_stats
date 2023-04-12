@@ -151,7 +151,18 @@ class SnmpStatisticsMonitor:
         self.ram_usage=None
         self.disk_usage=None
         self.sessions=None
-        self.cpuload3=None
+
+        self.include_performanceslas = config_entry.data.get(CONF_PERFORMANCESLASYESNO)
+        if self.include_performanceslas:
+            self.performance_slas = config_entry.data.get(CONF_PERFORMANCESLAS)
+            self.include_performanceslasstate = config_entry.data.get(CONF_PERFORMANCESLASSTATE)
+            self.include_performanceslaslinkmetrics = config_entry.data.get(CONF_PERFORMANCESLASLINKMETRICS)
+            self.include_performanceslasbandwidthprobe = config_entry.data.get(CONF_PERFORMANCESLASBANDWIDTHPROBE)
+                
+            LOGGER.error("Reading performance SLAS dict")
+            for each sla in self.performance_slas:
+                LOGGER.error(sla)
+                
                 
         self.fw_info = {
             OID_HOSTNAME: config_entry.data.get(OID_HOSTNAME),
@@ -261,6 +272,14 @@ class SnmpStatisticsMonitor:
                         sessioncount += int(oid_value.prettyPrint())
             
             self.sessions = sessioncount
+        
+               if self.include_performanceslas:
+            self.include_performanceslasstate = config_entry.data.get(CONF_PERFORMANCESLASSTATE)
+            self.include_performanceslaslinkmetrics = config_entry.data.get(CONF_PERFORMANCESLASLINKMETRICS)
+            self.include_performanceslasbandwidthprobe = config_entry.data.get(CONF_PERFORMANCESLASBANDWIDTHPROBE)
+ 
+ 
+        if self.includeperformanceslas:
         
     def update_netif_stats(self):
         if_data=self.current_if_data

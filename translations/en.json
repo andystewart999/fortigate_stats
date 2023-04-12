@@ -34,7 +34,7 @@
                 "data": {
                     "performanceslas": "Select performance SLAs",
 					"performanceslasstate": "Include overall state",
-					"performanceslasnetworkmetrics": "Include network state metrics",
+					"performanceslaslinkmetrics": "Include network state metrics",
 					"performanceslasbandwidthprobe": "Include probe bandwidth metrics"
                 },
                 "title": "Performance SLAs",

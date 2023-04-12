@@ -13,7 +13,7 @@ CONF_INTERFACESYESNO = "interfacesyesno"
 CONF_INTERFACES = "interfaces"
 CONF_PERFORMANCESLASYESNO = "performanceslasyesno"
 CONF_PERFORMANCESLAS = "performanceslas"
-CONF_PERFORMANCESLASLINKMETRICS = "performanceslasnetworkmetrics"
+CONF_PERFORMANCESLASLINKMETRICS = "performanceslaslinkmetrics"
 CONF_PERFORMANCESLASBANDWIDTHPROBE = "performanceslasbandwidthprobe"
 CONF_PERFORMANCESLASSTATE = "performanceslasstate"
 
