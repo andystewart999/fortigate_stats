@@ -56,8 +56,8 @@ CONFIG_SCHEMA_MAIN=vol.Schema(
                 vol.Required("disk"): bool,
                 vol.Required("sessions"): bool,
                 vol.Optional(CONF_SCAN_INTERVAL, default=10): int,
-                vol.Optional(CONF_INTERFACESYESNO, default = True): bool,
-                vol.Optional(CONF_PERFORMANCESLASYESNO, default = True): bool
+                vol.Optional(CONF_INTERFACESYESNO, default = False): bool,
+                vol.Optional(CONF_PERFORMANCESLASYESNO, default = False): bool
             }
 )
 

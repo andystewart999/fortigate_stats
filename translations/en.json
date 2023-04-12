@@ -17,11 +17,11 @@
 					"cpu_and_ram": "Monitor CPU and RAM usage",
 					"disk": "Monitor disk usage",
 					"sessions": "Monitor session count",
-					"interfacesyesno": "Monitor per-interface bandwidth usage",
+					"interfacesyesno": "Monitor network interfaces [NOT YET READY]",
 					"performanceslasyesno": "Monitor performance SLA information"
                 },
                 "title": "Enter firewall details",
-				"description": "Description goes here"
+				"description": "TO BE ADDED"
             },
             "interfaces": {
                 "data": {
