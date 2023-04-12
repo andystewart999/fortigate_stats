@@ -7,7 +7,7 @@ import sys
 
 # pylint: disable=unused-wildcard-import
 from .const import * 
-from .snmp import snmp_getfromtable
+from .snmp import snmp_getfromtable, snmp_getmultifromtable
 
 # pylint: enable=unused-wildcard-import
 import threading
@@ -160,7 +160,7 @@ class SnmpStatisticsMonitor:
             self.include_performanceslasbandwidthprobe = config_entry.data.get(CONF_PERFORMANCESLASBANDWIDTHPROBE)
                 
             LOGGER.error("Reading performance SLAS dict")
-            for each sla in self.performance_slas:
+            for sla in self.performance_slas:
                 LOGGER.error(sla)
                 
                 
@@ -272,15 +272,7 @@ class SnmpStatisticsMonitor:
                         sessioncount += int(oid_value.prettyPrint())
             
             self.sessions = sessioncount
-        
-               if self.include_performanceslas:
-            self.include_performanceslasstate = config_entry.data.get(CONF_PERFORMANCESLASSTATE)
-            self.include_performanceslaslinkmetrics = config_entry.data.get(CONF_PERFORMANCESLASLINKMETRICS)
-            self.include_performanceslasbandwidthprobe = config_entry.data.get(CONF_PERFORMANCESLASBANDWIDTHPROBE)
- 
- 
-        if self.includeperformanceslas:
-        
+                
     def update_netif_stats(self):
         if_data=self.current_if_data
         its = __class__.get_bulk_auto(self.target_ip, [
@@ -461,4 +453,34 @@ class SnmpStatisticsMonitor:
         if self.include_sessions:
             self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'sessions',"mdi:format-list-bulleted-type")
             
+        if self.include_performanceslas:
+            oids = (OID_PERFORMANCESLALINKNAME, OID_PERFORMANCESLALINKSTATE, OID_PERFORMANCESLALINKLATENCY, OID_PERFORMANCESLALINKJITTER, OID_PERFORMANCESLALINKPACKETLOSS, OID_PERFORMANCESLALINKBANDWIDTHIN, OID_PERFORMANCESLALINKBANDWIDTHOUT) 
 
+            errorIndication, snmp_data = snmp_getmultifromtable(self.target_ip, self.username, self.port, oids)
+            if not errorIndication:
+                for sla_name, sla_state, sla_latency, sla_jitter, sla_packetloss, sla_bandwidthin, sla_bandwidthout in snmp_data:
+                    if sla_name[0].prettyPrint() in self.performance_slas:
+                        #The performance SLA itself is in scope.  See what we should be creating sensors for
+                        sla_index = sla_name[0].prettyPrint().split(".")[-1]
+                        sla_name = sla_name[1].prettyPrint()
+                        
+                        if self.include_performanceslasstate:
+                            if sla_state[1].prettyPrint() == 0:
+                                sla_current_state = "Alive"
+                                sla_current_icon = "mdi:timeline-check-outline"
+                            else:
+                                sla_current_state = "Dead"
+                                sla_current_icon = "mdi:timeline-remove-outline"
+                                
+                            self._AddOrUpdateEntity(allSensorsPrefix+"sla_state_" + sla_index, sla_name + " state",sla_current_state,'',sla_current_icon)
+                        
+                        if self.include_performanceslaslinkmetrics:
+                            self._AddOrUpdateEntity(allSensorsPrefix+"sla_latency_" + sla_index, sla_name + " latency",int(float(sla_latency[1].prettyPrint())),'ms',"mdi:timeline-clock-outline")
+                            self._AddOrUpdateEntity(allSensorsPrefix+"sla_jitter_" + sla_index, sla_name + " jitter",int(float(sla_jitter[1].prettyPrint())),'ms',"mdi:timeline-clock-outline")
+                            self._AddOrUpdateEntity(allSensorsPrefix+"sla_packetloss_" + sla_index, sla_name + " packet loss",int(float(sla_packetloss[1].prettyPrint())),'%',"mdi:timeline-alert-outline")
+              
+                        if self.include_performanceslasbandwidthprobe:
+                            self._AddOrUpdateEntity(allSensorsPrefix+"sla_bandwidthin_" + sla_index, sla_name + " probe bandwidth (in) ",int(sla_bandwidthin[1].prettyPrint())/1000,'Mbps',"mdi:download-network-outline")
+                            self._AddOrUpdateEntity(allSensorsPrefix+"sla_bandwidthout_" + sla_index, sla_name + " probe bandwidth (out) ",int(sla_bandwidthout[1].prettyPrint())/1000,'Mbps',"mdi:upload-network-outline")
+                        
+ 

@@ -58,7 +58,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
         if user_input[CONF_INTERFACESYESNO]:
             return await self.async_step_interfaces()
         elif user_input[CONF_PERFORMANCESLASYESNO]:
-            self.data_schema = CONFIG_SCHEMA_PERFORMANCESLAS
             return await self.async_step_performanceslas()
         else:
             return self.async_create_entry(
@@ -159,12 +158,12 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                     {
                         vol.Required(
                             CONF_PERFORMANCESLAS): cv.multi_select(PERFORMANCESLA_LINKS),
-                        vol.Required(
-                            CONF_PERFORMANCESLASSTATE): bool,
-                        vol.Required(
-                            CONF_PERFORMANCESLASLINKMETRICS): bool,
-                        vol.Required(
-                            CONF_PERFORMANCESLASBANDWIDTHPROBE): bool,
+                        vol.Optional(
+                            CONF_PERFORMANCESLASSTATE, default = True): bool,
+                        vol.Optional(
+                            CONF_PERFORMANCESLASLINKMETRICS, default = True): bool,
+                        vol.Optional(
+                            CONF_PERFORMANCESLASBANDWIDTHPROBE, default = True): bool,
                     }
                 ),
             )
