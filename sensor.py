@@ -148,6 +148,10 @@ class SnmpStatisticsMonitor:
         self.include_disk=config_entry.data.get("disk")
         self.include_sessions=config_entry.data.get("sessions")
 
+        self.include_interfaces = config_entry.data.get(CONF_INTERFACESYESNO)
+        if self.include_interfaces:
+            self.interfaces = config_entry.data.get(CONF_INTERFACES)
+
         self.include_performanceslas = config_entry.data.get(CONF_PERFORMANCESLASYESNO)
         if self.include_performanceslas:
             self.performance_slas = config_entry.data.get(CONF_PERFORMANCESLAS)
@@ -258,42 +262,48 @@ class SnmpStatisticsMonitor:
             if_data[k]['tx_octets_prev']=if_data[k]['tx_octets']
 
 
+        LOGGER.error("Selected interfaces")
+        LOGGER.error(CONF_INTERFACES)
 
         for it in its:
             for k, v in it.items():
-                oidParts=k.split('.')
-                ifId=oidParts[-1]
-                infotype=oidParts[-2]
-                if ifId not in if_data:
-                    if_data[ifId]={
-                        'name':'',
-                        'name2':'',
-                        'alias':'',
-                        'rx_octets':-1,
-                        'tx_octets':-1,
-                        'rx_speed_octets':-1.0,
-                        'tx_speed_octets':-1.0,
-                        'rx_octets_prev':-1.0,
-                        'tx_octets_prev':-1.0,
-                        'last_stat_time':time.time(),
-                        'rx_diff':-1,
-                        'tx_diff':-1
-                        }
+                LOGGER.error("Interface OID")
+                LOGGER.error(k)
                 
-                if infotype=='2':
-                    if_data[ifId]['name']=v
-                elif infotype=='1':
-                    if_data[ifId]['name2']=v
-                elif infotype=='18':
-                    if_data[ifId]['alias']=v
-                elif k.find('2.2.1.10')>-1:
-                    if_data[ifId]['rx_octets']=v
-                elif k.find('2.2.1.16')>-1:
-                    if_data[ifId]['tx_octets']=v
-                elif k.find('31.1.1.1.6')>-1:
-                    if_data[ifId]['rx_octets']=v
-                elif k.find('31.1.1.1.10')>-1:
-                    if_data[ifId]['tx_octets']=v
+                if k in self.interfaces:
+                    oidParts=k.split('.')
+                    ifId=oidParts[-1]
+                    infotype=oidParts[-2]
+                    if ifId not in if_data:
+                        if_data[ifId]={
+                            'name':'',
+                            'name2':'',
+                            'alias':'',
+                            'rx_octets':-1,
+                            'tx_octets':-1,
+                            'rx_speed_octets':-1.0,
+                            'tx_speed_octets':-1.0,
+                            'rx_octets_prev':-1.0,
+                            'tx_octets_prev':-1.0,
+                            'last_stat_time':time.time(),
+                            'rx_diff':-1,
+                            'tx_diff':-1
+                            }
+                
+                    if infotype=='2':
+                        if_data[ifId]['name']=v
+                    elif infotype=='1':
+                        if_data[ifId]['name2']=v
+                    elif infotype=='18':
+                        if_data[ifId]['alias']=v
+                    elif k.find('2.2.1.10')>-1:
+                        if_data[ifId]['rx_octets']=v
+                    elif k.find('2.2.1.16')>-1:
+                        if_data[ifId]['tx_octets']=v
+                    elif k.find('31.1.1.1.6')>-1:
+                        if_data[ifId]['rx_octets']=v
+                    elif k.find('31.1.1.1.10')>-1:
+                        if_data[ifId]['tx_octets']=v
 
 
         new_if_data_time=time.time()
@@ -365,22 +375,22 @@ class SnmpStatisticsMonitor:
             self.meterSensors[id]=sensor
             
         if attributes is not None:
-            sensot.set_attributes (attributes)
+            sensor.set_attributes (attributes)
         
     def AddOrUpdateEntities(self):
         allSensorsPrefix = "sensor." + DOMAIN + "_" + self.fw_info[OID_SERIALNUMBER].replace('.','_') + "_"
         
         #TODO - use the code below as a basis for per-interface sensors
         
-         for k in self.current_if_data:
-             cur_if_data=self.current_if_data[k]
-             if_name=cur_if_data['name2']
-             if_alias=cur_if_data['alias']
+        for k in self.current_if_data:
+            cur_if_data=self.current_if_data[k]
+            if_name=cur_if_data['name2']
+            if_alias=cur_if_data['alias']
 
-            # if_rx_mbit=cur_if_data['rx_speed_octets']*8/1000/1000
-            # if_tx_mbit=cur_if_data['tx_speed_octets']*8/1000/1000
-             if_rx_mbyte=cur_if_data['rx_speed_octets']/1000/1000
-             if_tx_mbyte=cur_if_data['tx_speed_octets']/1000/1000
+            if_rx_mbit=cur_if_data['rx_speed_octets']*8/1000/1000
+            if_tx_mbit=cur_if_data['tx_speed_octets']*8/1000/1000
+            #if_rx_mbyte=cur_if_data['rx_speed_octets']/1000/1000
+            #if_tx_mbyte=cur_if_data['tx_speed_octets']/1000/1000
 
 
 
@@ -388,11 +398,11 @@ class SnmpStatisticsMonitor:
             # if_tx_total_mbit=cur_if_data['tx_octets']*8/1000/1000
 
 
-            # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_name+" BW Out (mbit)",round(if_tx_mbit,2),'mbit/s')
-            # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_name+" BW In (mbit)",round(if_rx_mbit,2),'mbit/s')
+            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_name+" BW Out",round(if_tx_mbit,2),'Mbps',"mdi:upload-network-outline")
+            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_name+" BW In",round(if_rx_mbit,2),'Mbps',"mdi:download-network-outline")
 
-             self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
-             self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
+            #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')
 
 
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_out_mbit',if_name+" Total Out (mbit)",round(if_tx_total_mbit,2),'mbit')

@@ -31,7 +31,7 @@ PERFORMANCESLAS_ICON = {
 LOGGER = logging.getLogger(__package__)
 
 DOMAIN = "fortigate_stats"
-DEFAULT_SCAN_INTERVAL = 10
+DEFAULT_SCAN_INTERVAL = 30
 DEFAULT_PORT = 161
 
 #OIDS

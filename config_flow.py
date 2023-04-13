@@ -141,7 +141,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             return await self.async_step_performanceslas()
         else:
             return self.async_create_entry(
-                title=user_input[OID_HOSTNAME],
+                title=self.user_input[OID_HOSTNAME],
                 data=self.user_input
             )
     
