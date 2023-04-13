@@ -234,7 +234,7 @@ class SnmpStatisticsMonitor:
 
     #endregion
     def update_stats(self):
-        #self.update_netif_stats()
+        self.update_netif_stats()
         test = "test"
         
     def update_netif_stats(self):
@@ -372,15 +372,15 @@ class SnmpStatisticsMonitor:
         
         #TODO - use the code below as a basis for per-interface sensors
         
-        # for k in self.current_if_data:
-            # cur_if_data=self.current_if_data[k]
-            # if_name=cur_if_data['name2']
-            # if_alias=cur_if_data['alias']
+         for k in self.current_if_data:
+             cur_if_data=self.current_if_data[k]
+             if_name=cur_if_data['name2']
+             if_alias=cur_if_data['alias']
 
             # if_rx_mbit=cur_if_data['rx_speed_octets']*8/1000/1000
             # if_tx_mbit=cur_if_data['tx_speed_octets']*8/1000/1000
-            # if_rx_mbyte=cur_if_data['rx_speed_octets']/1000/1000
-            # if_tx_mbyte=cur_if_data['tx_speed_octets']/1000/1000
+             if_rx_mbyte=cur_if_data['rx_speed_octets']/1000/1000
+             if_tx_mbyte=cur_if_data['tx_speed_octets']/1000/1000
 
 
 
@@ -391,8 +391,8 @@ class SnmpStatisticsMonitor:
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_name+" BW Out (mbit)",round(if_tx_mbit,2),'mbit/s')
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_name+" BW In (mbit)",round(if_rx_mbit,2),'mbit/s')
 
-            # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
-            # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')
+             self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
+             self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')
 
 
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_out_mbit',if_name+" Total Out (mbit)",round(if_tx_total_mbit,2),'mbit')
