@@ -137,7 +137,7 @@ class SnmpStatisticsMonitor:
         self.meterSensors={}
         self.stopped = False
         self.async_add_entities=async_add_entities
-        self.current_if_data={}
+        self.current_if_data={} 
         self.current_if_data_time=0
         self.stat_time=0
         self.username=config_entry.data.get(CONF_USERNAME)
@@ -147,10 +147,6 @@ class SnmpStatisticsMonitor:
         self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
         self.include_disk=config_entry.data.get("disk")
         self.include_sessions=config_entry.data.get("sessions")
-        self.cpu_usage=None
-        self.ram_usage=None
-        self.disk_usage=None
-        self.sessions=None
 
         self.include_performanceslas = config_entry.data.get(CONF_PERFORMANCESLASYESNO)
         if self.include_performanceslas:
@@ -239,35 +235,8 @@ class SnmpStatisticsMonitor:
     #endregion
     def update_stats(self):
         #self.update_netif_stats()
-        if self.include_cpu_and_ram:
-            snmp_data=__class__.get(self.target_ip,[
-                OID_CPUUSAGE,
-                OID_RAMUSAGE,
-                ],hlapi.CommunityData(self.username))
-
-        self.cpu_usage=snmp_data[OID_CPUUSAGE]
-        self.ram_usage=snmp_data[OID_RAMUSAGE]
-
-        if self.include_disk:
-            snmp_data=__class__.get(self.target_ip,[
-                OID_DISKUSAGE,
-                OID_DISKCAPACITY,
-                ],hlapi.CommunityData(self.username))
-
-            self.disk_usage = int((snmp_data[OID_DISKUSAGE] / snmp_data[OID_DISKCAPACITY]) * 100)
-
-        if self.include_sessions:
-            errorIndication, snmp_data = snmp_getfromtable(self.target_ip, self.username, self.port, OID_SESSIONCOUNT)
-            
-            sessioncount = 0
-            if not errorIndication:
-                
-                for oid_entry in snmp_data:
-                    for oid, oid_value in oid_entry:
-                        sessioncount += int(oid_value.prettyPrint())
-            
-            self.sessions = sessioncount
-                
+        test = "test"
+        
     def update_netif_stats(self):
         if_data=self.current_if_data
         its = __class__.get_bulk_auto(self.target_ip, [
@@ -432,24 +401,40 @@ class SnmpStatisticsMonitor:
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_out_byte',if_name+" Total Out (bytes)",cur_if_data['tx_octets'],'byte')
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_in_byte',if_name+" Total In (bytes)",cur_if_data['rx_octets'],'byte')
 
-
-
         if self.include_cpu_and_ram:
-            self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",self.cpu_usage,'%',"mdi:memory")
-            self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",self.ram_usage,'%',"mdi:memory")
+            snmp_data=__class__.get(self.target_ip,[
+                OID_CPUUSAGE,
+                OID_RAMUSAGE,
+                ],hlapi.CommunityData(self.username))
+
+            self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",snmp_data[OID_CPUUSAGE],'%',"mdi:memory")
+            self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",snmp_data[OID_RAMUSAGE],'%',"mdi:memory")
 
         if self.include_disk:
-            #Attributes test
+            snmp_data=__class__.get(self.target_ip,[
+                OID_DISKUSAGE,
+                OID_DISKCAPACITY,
+                ],hlapi.CommunityData(self.username))
+
+            disk_usage = int((snmp_data[OID_DISKUSAGE] / snmp_data[OID_DISKCAPACITY]) * 100)
             disk_attrs = (
                 {
-                    "Disk size":100,
-                    "Disk usage":99
+                    "Disk capacity (MB)":snmp_data[OID_DISKCAPACITY],
+                    "Disk usage (MB)":snmp_data[OID_DISKUSAGE]
                 }
             )
-            self._AddOrUpdateEntity(allSensorsPrefix+"disk_usage","Disk usage",self.disk_usage,'%',"mdi:database", disk_attrs)
-        
+            self._AddOrUpdateEntity(allSensorsPrefix+"disk_usage","Disk usage",disk_usage,'%',"mdi:database", disk_attrs)
+
         if self.include_sessions:
-            self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",self.sessions,'sessions',"mdi:format-list-bulleted-type")
+            errorIndication, snmp_data = snmp_getfromtable(self.target_ip, self.username, self.port, OID_SESSIONCOUNT)
+            
+            sessioncount = 0
+            if not errorIndication:
+                for oid_entry in snmp_data:
+                    for oid, oid_value in oid_entry:
+                        sessioncount += int(oid_value.prettyPrint())
+            
+            self._AddOrUpdateEntity(allSensorsPrefix+"sessions","Sessions",sessioncount,'sessions',"mdi:format-list-bulleted-type")
             
         if self.include_performanceslas:
             oids = (OID_PERFORMANCESLALINKNAME, OID_PERFORMANCESLALINKSTATE, OID_PERFORMANCESLALINKLATENCY, OID_PERFORMANCESLALINKJITTER, OID_PERFORMANCESLALINKPACKETLOSS, OID_PERFORMANCESLALINKBANDWIDTHIN, OID_PERFORMANCESLALINKBANDWIDTHOUT) 
@@ -461,16 +446,16 @@ class SnmpStatisticsMonitor:
                         #The performance SLA itself is in scope.  See what we should be creating sensors for
                         sla_index = sla_name[0].prettyPrint().split(".")[-1]
                         sla_name = sla_name[1].prettyPrint()
+                        sla_state = sla_state[1].prettyPrint()
                         
                         if self.include_performanceslasstate:
-                            if sla_state[1].prettyPrint() == 0:
-                                sla_current_state = "Alive"
-                                sla_current_icon = "mdi:timeline-check-outline"
-                            else:
-                                sla_current_state = "Dead"
-                                sla_current_icon = "mdi:timeline-remove-outline"
-                                
-                            self._AddOrUpdateEntity(allSensorsPrefix+"sla_state_" + sla_index, sla_name + " state",sla_current_state,'',sla_current_icon)
+                            #if sla_state[1].prettyPrint() == 0:
+                            #    sla_current_state = "Alive"
+                            #    sla_current_icon = "mdi:timeline-check-outline"
+                            #else:
+                            #    sla_current_state = "Dead"
+                            #    sla_current_icon = "mdi:timeline-remove-outline"
+                            self._AddOrUpdateEntity(allSensorsPrefix+"sla_state_" + sla_index, sla_name + " state",PERFORMANCESLAS_STATE[sla_state],'',PERFORMANCESLAS_ICON[sla_state])
                         
                         if self.include_performanceslaslinkmetrics:
                             self._AddOrUpdateEntity(allSensorsPrefix+"sla_latency_" + sla_index, sla_name + " latency",int(float(sla_latency[1].prettyPrint())),'ms',"mdi:timeline-clock-outline")
