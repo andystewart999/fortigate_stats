@@ -238,7 +238,6 @@ class SnmpStatisticsMonitor:
 
     #endregion
     def update_stats(self):
-        LOGGER.error ("Calling self.update_netif_stats")
         self.update_netif_stats()
         
     def update_netif_stats(self):
@@ -279,10 +278,10 @@ class SnmpStatisticsMonitor:
                     if_data[ifId]['rx_octets'] = int(if_hcinoctets[1].prettyPrint())
                     if_data[ifId]['tx_octets'] = int(if_hcoutoctets[1].prettyPrint())
 
-                new_if_data_time=time.time()
                 for k in self.current_if_data:
                     cur_data=self.current_if_data[k]
                     
+                    new_if_data_time=time.time()
                     timediff_statistics=new_if_data_time-cur_data['last_stat_time']
                     timediff_stat_seconds=timediff_statistics#/1000.0
 
@@ -292,10 +291,12 @@ class SnmpStatisticsMonitor:
                     cur_data['rx_diff']=rx_diff
                     cur_data['tx_diff']=tx_diff
 
+                    LOGGER.error("timediff_stat_seconds = "+ str(timediff_stat_seconds))
                     if timediff_stat_seconds<1:
                         continue
 
                     if rx_diff==0 and tx_diff==0 and timediff_stat_seconds<4:##wait until really going to 0
+                        LOGGER.error("Not going to zero for some reason?")
                         continue
 
                     rx_byte_s = rx_diff / timediff_stat_seconds
@@ -318,7 +319,6 @@ class SnmpStatisticsMonitor:
             try:
                 self.update_stats()
                 if self.async_add_entities is not None:
-                    LOGGER.error ("just called self.update_stats")
                     self.AddOrUpdateEntities()
             except (KeyError,PySnmpError):
                 time.sleep(1)
@@ -328,7 +328,7 @@ class SnmpStatisticsMonitor:
             if self.updateIntervalSeconds is None:
                 self.updateIntervalSeconds=DEFAULT_SCAN_INTERVAL
 
-            time.sleep(max(1,self.updateIntervalSeconds))
+            time.sleep(self.updateIntervalSeconds)
 
     #region HA
     def setupEntities(self):
