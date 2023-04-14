@@ -11,6 +11,8 @@ from homeassistant.const import (
 )
 CONF_INTERFACESYESNO = "interfacesyesno"
 CONF_INTERFACES = "interfaces"
+CONF_INTERFACESBANDWIDTH="interfacesbandwidth"
+CONF_INTERFACESOCTETS="interfacesoctets"
 CONF_PERFORMANCESLASYESNO = "performanceslasyesno"
 CONF_PERFORMANCESLAS = "performanceslas"
 CONF_PERFORMANCESLASLINKMETRICS = "performanceslaslinkmetrics"

@@ -114,6 +114,10 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                     {
                         vol.Required(
                             CONF_INTERFACES): cv.multi_select(CONNECTED_INTERFACES),
+                        vol.Optional(
+                            CONF_INTERFACESBANDWIDTH, default = True): bool,
+                        vol.Optional(
+                            CONF_INTERFACESOCTETS, default = False): bool,
                     }
                 ),
             )

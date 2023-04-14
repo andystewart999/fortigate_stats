@@ -4,6 +4,7 @@ import time
 import traceback
 from datetime import datetime
 import sys
+from random import randrange
 
 # pylint: disable=unused-wildcard-import
 from .const import * 
@@ -151,6 +152,8 @@ class SnmpStatisticsMonitor:
         self.include_interfaces = config_entry.data.get(CONF_INTERFACESYESNO)
         if self.include_interfaces:
             self.interfaces = config_entry.data.get(CONF_INTERFACES)
+            self.interfacesbandwidth = config_entry.data.get(CONF_INTERFACESBANDWIDTH)
+            self.interfacesoctets = config_entry.data.get(CONF_INTERFACESOCTETS)
 
         self.include_performanceslas = config_entry.data.get(CONF_PERFORMANCESLASYESNO)
         if self.include_performanceslas:
@@ -241,6 +244,7 @@ class SnmpStatisticsMonitor:
         self.update_netif_stats()
         
     def update_netif_stats(self):
+        LOGGER.error("Entered update_netif_stats - " + datetime.now().strftime("%H:%M:%S"))
         if_data=self.current_if_data
  
         oids = (OID_IFNAME, OID_IFALIAS, OID_IFHCINOCTETS, OID_IFHCOUTOCTETS) 
@@ -251,7 +255,6 @@ class SnmpStatisticsMonitor:
                 if_data[interface]['rx_octets_prev'] = if_data[interface]['rx_octets']
                 if_data[interface]['tx_octets_prev'] = if_data[interface]['tx_octets']
 
-
             for if_name, if_alias, if_hcinoctets, if_hcoutoctets in snmp_data:
                 if if_name[0].prettyPrint() in self.interfaces:
                     #The interface is in scope.
@@ -259,6 +262,7 @@ class SnmpStatisticsMonitor:
                         
                     ifId = if_name[0].prettyPrint()
                     if ifId not in if_data:
+                        LOGGER.error ("ifId not found in if_data " + datetime.now().strftime("%H:%M:%S"))
                         if_data[ifId]={
                             'name':'',
                             'alias':'',
@@ -278,37 +282,40 @@ class SnmpStatisticsMonitor:
                     if_data[ifId]['rx_octets'] = int(if_hcinoctets[1].prettyPrint())
                     if_data[ifId]['tx_octets'] = int(if_hcoutoctets[1].prettyPrint())
 
-                for k in self.current_if_data:
-                    cur_data=self.current_if_data[k]
-                    
-                    new_if_data_time=time.time()
-                    timediff_statistics=new_if_data_time-cur_data['last_stat_time']
-                    timediff_stat_seconds=timediff_statistics#/1000.0
+            new_if_data_time=time.time()
+            LOGGER.error ("Entering for k in self.current_if_data - " + datetime.now().strftime("%H:%M:%S"))
+            LOGGER.error ("Length of self.current_if_data is " + str(len(self.current_if_data)))
+            for k in self.current_if_data:
+                cur_data=self.current_if_data[k]
+                LOGGER.error ("Found current_if_data for " + cur_data['name'] + " - " + datetime.now().strftime("%H:%M:%S"))
+                
+                timediff_statistics=new_if_data_time-cur_data['last_stat_time']
+                timediff_stat_seconds=timediff_statistics#/1000.0
 
-                    rx_diff=cur_data['rx_octets'] - cur_data['rx_octets_prev']
-                    tx_diff=cur_data['tx_octets'] - cur_data['tx_octets_prev']
+                rx_diff=cur_data['rx_octets'] - cur_data['rx_octets_prev']
+                tx_diff=cur_data['tx_octets'] - cur_data['tx_octets_prev']
 
-                    cur_data['rx_diff']=rx_diff
-                    cur_data['tx_diff']=tx_diff
+                cur_data['rx_diff']=rx_diff
+                cur_data['tx_diff']=tx_diff
 
-                    LOGGER.error("timediff_stat_seconds = "+ str(timediff_stat_seconds))
-                    if timediff_stat_seconds<1:
-                        continue
+                LOGGER.error("timediff_stat_seconds = "+ str(timediff_stat_seconds) + datetime.now().strftime("%H:%M:%S"))
+                if timediff_stat_seconds<1:
+                    continue
 
-                    if rx_diff==0 and tx_diff==0 and timediff_stat_seconds<4:##wait until really going to 0
-                        LOGGER.error("Not going to zero for some reason?")
-                        continue
+                if rx_diff==0 and tx_diff==0 and timediff_stat_seconds<4:##wait until really going to 0
+                    LOGGER.error("Not going to zero for some reason?")
+                    continue
 
-                    rx_byte_s = rx_diff / timediff_stat_seconds
-                    tx_byte_s = tx_diff / timediff_stat_seconds
-                    cur_data['last_stat_time']=new_if_data_time
+                rx_byte_s = rx_diff / timediff_stat_seconds
+                tx_byte_s = tx_diff / timediff_stat_seconds
+                cur_data['last_stat_time']=new_if_data_time
 
-                    cur_data['rx_speed_octets']=rx_byte_s
-                    cur_data['tx_speed_octets']=tx_byte_s
+                cur_data['rx_speed_octets']=rx_byte_s
+                cur_data['tx_speed_octets']=tx_byte_s
 
 
-                self.current_if_data=if_data
-                self.current_if_data_time=new_if_data_time
+            self.current_if_data=if_data
+            self.current_if_data_time=new_if_data_time
 
     def start(self):
         threading.Thread(target=self.watcher).start()
@@ -317,6 +324,7 @@ class SnmpStatisticsMonitor:
 
         while not self.stopped:
             try:
+                LOGGER.error ("Entering watcher_try loop " + datetime.now().strftime("%H:%M:%S"))
                 self.update_stats()
                 if self.async_add_entities is not None:
                     self.AddOrUpdateEntities()
@@ -328,6 +336,7 @@ class SnmpStatisticsMonitor:
             if self.updateIntervalSeconds is None:
                 self.updateIntervalSeconds=DEFAULT_SCAN_INTERVAL
 
+            LOGGER.error ("Entering time.sleep(" + str(self.updateIntervalSeconds) + ") " + datetime.now().strftime("%H:%M:%S"))
             time.sleep(self.updateIntervalSeconds)
 
     #region HA
@@ -376,12 +385,13 @@ class SnmpStatisticsMonitor:
             # if_rx_total_mbit=cur_if_data['rx_octets']*8/1000/1000
             # if_tx_total_mbit=cur_if_data['tx_octets']*8/1000/1000
 
+            if self.interfacesbandwidth:
+                self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_display+" bandwidth out",round(if_tx_mbit,2),'Mbps',"mdi:upload-network-outline")
+                self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_display+" bandwidth in",round(if_rx_mbit,2),'Mbps',"mdi:download-network-outline")
 
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_display+" out",round(if_tx_mbit,2),'Mbps',"mdi:upload-network-outline")
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_display+" in",round(if_rx_mbit,2),'Mbps',"mdi:download-network-outline")
-
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_octets_in',if_display+" octets in",int(cur_if_data['rx_octets']),'octets',"mdi:download-network-outline")
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_octets_out',if_display+" octets out",int(cur_if_data['tx_octets']),'octets',"mdi:download-network-outline")
+            if self.interfacesoctets:
+                self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_octets_out',if_display+" octets out",int(cur_if_data['tx_octets']),'octets',"mdi:upload-network-outline")
+                self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_octets_in',if_display+" octets in",int(cur_if_data['rx_octets']),'octets',"mdi:download-network-outline")
 
             #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
             #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')
@@ -441,12 +451,6 @@ class SnmpStatisticsMonitor:
                         sla_state = sla_state[1].prettyPrint()
                         
                         if self.include_performanceslasstate:
-                            #if sla_state[1].prettyPrint() == 0:
-                            #    sla_current_state = "Alive"
-                            #    sla_current_icon = "mdi:timeline-check-outline"
-                            #else:
-                            #    sla_current_state = "Dead"
-                            #    sla_current_icon = "mdi:timeline-remove-outline"
                             self._AddOrUpdateEntity(allSensorsPrefix+"sla_state_" + sla_index, sla_name + " state",PERFORMANCESLAS_STATE[sla_state],'',PERFORMANCESLAS_ICON[sla_state])
                         
                         if self.include_performanceslaslinkmetrics:

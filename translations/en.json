@@ -25,7 +25,9 @@
             },
             "interfaces": {
                 "data": {
-                    "interfaces": "Select interfaces"
+                    "interfaces": "Select interfaces",
+					"interfacesbandwidth": "Include bandwidth metrics",
+					"interfacesoctets": "Include bandwidth octets"
                 },
                 "title": "Firewall interfaces",
 				"description": "Select which network interfaces to monitor.  Note that only currently connected interfaces are shown."
