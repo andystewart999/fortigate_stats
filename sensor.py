@@ -244,7 +244,6 @@ class SnmpStatisticsMonitor:
         self.update_netif_stats()
         
     def update_netif_stats(self):
-        LOGGER.error("Entered update_netif_stats - " + datetime.now().strftime("%H:%M:%S"))
         if_data=self.current_if_data
  
         oids = (OID_IFNAME, OID_IFALIAS, OID_IFHCINOCTETS, OID_IFHCOUTOCTETS) 
@@ -258,11 +257,9 @@ class SnmpStatisticsMonitor:
             for if_name, if_alias, if_hcinoctets, if_hcoutoctets in snmp_data:
                 if if_name[0].prettyPrint() in self.interfaces:
                     #The interface is in scope.
-                    LOGGER.error("Found interface " + if_name[1].prettyPrint())
                         
                     ifId = if_name[0].prettyPrint()
                     if ifId not in if_data:
-                        LOGGER.error ("ifId not found in if_data " + datetime.now().strftime("%H:%M:%S"))
                         if_data[ifId]={
                             'name':'',
                             'alias':'',
@@ -283,11 +280,8 @@ class SnmpStatisticsMonitor:
                     if_data[ifId]['tx_octets'] = int(if_hcoutoctets[1].prettyPrint())
 
             new_if_data_time=time.time()
-            LOGGER.error ("Entering for k in self.current_if_data - " + datetime.now().strftime("%H:%M:%S"))
-            LOGGER.error ("Length of self.current_if_data is " + str(len(self.current_if_data)))
             for k in self.current_if_data:
                 cur_data=self.current_if_data[k]
-                LOGGER.error ("Found current_if_data for " + cur_data['name'] + " - " + datetime.now().strftime("%H:%M:%S"))
                 
                 timediff_statistics=new_if_data_time-cur_data['last_stat_time']
                 timediff_stat_seconds=timediff_statistics#/1000.0
@@ -298,12 +292,10 @@ class SnmpStatisticsMonitor:
                 cur_data['rx_diff']=rx_diff
                 cur_data['tx_diff']=tx_diff
 
-                LOGGER.error("timediff_stat_seconds = "+ str(timediff_stat_seconds) + datetime.now().strftime("%H:%M:%S"))
                 if timediff_stat_seconds<1:
                     continue
 
                 if rx_diff==0 and tx_diff==0 and timediff_stat_seconds<4:##wait until really going to 0
-                    LOGGER.error("Not going to zero for some reason?")
                     continue
 
                 rx_byte_s = rx_diff / timediff_stat_seconds
@@ -324,7 +316,6 @@ class SnmpStatisticsMonitor:
 
         while not self.stopped:
             try:
-                LOGGER.error ("Entering watcher_try loop " + datetime.now().strftime("%H:%M:%S"))
                 self.update_stats()
                 if self.async_add_entities is not None:
                     self.AddOrUpdateEntities()
@@ -332,11 +323,9 @@ class SnmpStatisticsMonitor:
                 time.sleep(1)
             except:
                 e = traceback.format_exc()
-                LOGGER.error(e)
             if self.updateIntervalSeconds is None:
                 self.updateIntervalSeconds=DEFAULT_SCAN_INTERVAL
 
-            LOGGER.error ("Entering time.sleep(" + str(self.updateIntervalSeconds) + ") " + datetime.now().strftime("%H:%M:%S"))
             time.sleep(self.updateIntervalSeconds)
 
     #region HA
