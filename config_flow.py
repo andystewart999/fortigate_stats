@@ -117,10 +117,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                     }
                 ),
             )
-
-        #interfacetest = user_input2[CONF_INTERFACES]
-        #LOGGER.error ("CONF_INTERFACES")
-        #LOGGER.error (interfacetest)
                         
         try:
             #Checks here

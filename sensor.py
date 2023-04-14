@@ -238,46 +238,30 @@ class SnmpStatisticsMonitor:
 
     #endregion
     def update_stats(self):
+        LOGGER.error ("Calling self.update_netif_stats")
         self.update_netif_stats()
-        test = "test"
         
     def update_netif_stats(self):
         if_data=self.current_if_data
-        its = __class__.get_bulk_auto(self.target_ip, [
-            '1.3.6.1.2.1.2.2.1.2',#v1, ifDescr
-            #'1.3.6.1.2.1.2.2.1.16',#v1, ifOutOctets
-            #'1.3.6.1.2.1.2.2.1.10',#v1, ifInOctets
-            '1.3.6.1.2.1.31.1.1.1.1',#v2, ifName
-            '1.3.6.1.2.1.31.1.1.1.18',#v2, ifAlias
-            '1.3.6.1.2.1.31.1.1.1.6', #v2, ifHCInOctets
-            '1.3.6.1.2.1.31.1.1.1.10', #v2, ifHCOutOctets
-        ], hlapi.CommunityData(self.username, mpModel=1), 
-            '1.3.6.1.2.1.2.1.0' #v1, ifCount
-        )
+ 
+        oids = (OID_IFNAME, OID_IFALIAS, OID_IFHCINOCTETS, OID_IFHCOUTOCTETS) 
+        errorIndication, snmp_data = snmp_getmultifromtable(self.target_ip, self.username, self.port, oids)
+        if not errorIndication:
 
-        
-
-        for k in if_data:
-            if_data[k]['rx_octets_prev']=if_data[k]['rx_octets']
-            if_data[k]['tx_octets_prev']=if_data[k]['tx_octets']
+            for interface in if_data:
+                if_data[interface]['rx_octets_prev'] = if_data[interface]['rx_octets']
+                if_data[interface]['tx_octets_prev'] = if_data[interface]['tx_octets']
 
 
-        LOGGER.error("Selected interfaces")
-        LOGGER.error(CONF_INTERFACES)
-
-        for it in its:
-            for k, v in it.items():
-                LOGGER.error("Interface OID")
-                LOGGER.error(k)
-                
-                if k in self.interfaces:
-                    oidParts=k.split('.')
-                    ifId=oidParts[-1]
-                    infotype=oidParts[-2]
+            for if_name, if_alias, if_hcinoctets, if_hcoutoctets in snmp_data:
+                if if_name[0].prettyPrint() in self.interfaces:
+                    #The interface is in scope.
+                    LOGGER.error("Found interface " + if_name[1].prettyPrint())
+                        
+                    ifId = if_name[0].prettyPrint()
                     if ifId not in if_data:
                         if_data[ifId]={
                             'name':'',
-                            'name2':'',
                             'alias':'',
                             'rx_octets':-1,
                             'tx_octets':-1,
@@ -290,52 +274,40 @@ class SnmpStatisticsMonitor:
                             'tx_diff':-1
                             }
                 
-                    if infotype=='2':
-                        if_data[ifId]['name']=v
-                    elif infotype=='1':
-                        if_data[ifId]['name2']=v
-                    elif infotype=='18':
-                        if_data[ifId]['alias']=v
-                    elif k.find('2.2.1.10')>-1:
-                        if_data[ifId]['rx_octets']=v
-                    elif k.find('2.2.1.16')>-1:
-                        if_data[ifId]['tx_octets']=v
-                    elif k.find('31.1.1.1.6')>-1:
-                        if_data[ifId]['rx_octets']=v
-                    elif k.find('31.1.1.1.10')>-1:
-                        if_data[ifId]['tx_octets']=v
+                    if_data[ifId]['name'] = if_name[1].prettyPrint()
+                    if_data[ifId]['alias'] = if_alias[1].prettyPrint()
+                    if_data[ifId]['rx_octets'] = int(if_hcinoctets[1].prettyPrint())
+                    if_data[ifId]['tx_octets'] = int(if_hcoutoctets[1].prettyPrint())
+
+                new_if_data_time=time.time()
+                for k in self.current_if_data:
+                    cur_data=self.current_if_data[k]
+                    
+                    timediff_statistics=new_if_data_time-cur_data['last_stat_time']
+                    timediff_stat_seconds=timediff_statistics#/1000.0
+
+                    rx_diff=cur_data['rx_octets'] - cur_data['rx_octets_prev']
+                    tx_diff=cur_data['tx_octets'] - cur_data['tx_octets_prev']
+
+                    cur_data['rx_diff']=rx_diff
+                    cur_data['tx_diff']=tx_diff
+
+                    if timediff_stat_seconds<1:
+                        continue
+
+                    if rx_diff==0 and tx_diff==0 and timediff_stat_seconds<4:##wait until really going to 0
+                        continue
+
+                    rx_byte_s = rx_diff / timediff_stat_seconds
+                    tx_byte_s = tx_diff / timediff_stat_seconds
+                    cur_data['last_stat_time']=new_if_data_time
+
+                    cur_data['rx_speed_octets']=rx_byte_s
+                    cur_data['tx_speed_octets']=tx_byte_s
 
 
-        new_if_data_time=time.time()
-        for k in self.current_if_data:
-            cur_data=self.current_if_data[k]
-            
-            timediff_statistics=new_if_data_time-cur_data['last_stat_time']
-            timediff_stat_seconds=timediff_statistics#/1000.0
-
-            rx_diff=cur_data['rx_octets']-cur_data['rx_octets_prev']
-            tx_diff=cur_data['tx_octets']-cur_data['tx_octets_prev']
-
-
-            cur_data['rx_diff']=rx_diff
-            cur_data['tx_diff']=tx_diff
-
-            if timediff_stat_seconds<1:
-                continue
-
-            if rx_diff==0 and tx_diff==0 and timediff_stat_seconds<4:##wait until really going to 0
-                continue
-
-            rx_byte_s=rx_diff/timediff_stat_seconds
-            tx_byte_s=tx_diff/timediff_stat_seconds
-            cur_data['last_stat_time']=new_if_data_time
-
-            cur_data['rx_speed_octets']=rx_byte_s
-            cur_data['tx_speed_octets']=tx_byte_s
-
-
-        self.current_if_data=if_data
-        self.current_if_data_time=new_if_data_time
+                self.current_if_data=if_data
+                self.current_if_data_time=new_if_data_time
 
     def start(self):
         threading.Thread(target=self.watcher).start()
@@ -346,6 +318,7 @@ class SnmpStatisticsMonitor:
             try:
                 self.update_stats()
                 if self.async_add_entities is not None:
+                    LOGGER.error ("just called self.update_stats")
                     self.AddOrUpdateEntities()
             except (KeyError,PySnmpError):
                 time.sleep(1)
@@ -353,13 +326,14 @@ class SnmpStatisticsMonitor:
                 e = traceback.format_exc()
                 LOGGER.error(e)
             if self.updateIntervalSeconds is None:
-                self.updateIntervalSeconds=5
+                self.updateIntervalSeconds=DEFAULT_SCAN_INTERVAL
 
             time.sleep(max(1,self.updateIntervalSeconds))
 
     #region HA
     def setupEntities(self):
         self.update_stats()
+        
         if self.async_add_entities is not None:
             self.AddOrUpdateEntities()
 
@@ -384,9 +358,14 @@ class SnmpStatisticsMonitor:
         
         for k in self.current_if_data:
             cur_if_data=self.current_if_data[k]
-            if_name=cur_if_data['name2']
+            if_name=cur_if_data['name']
             if_alias=cur_if_data['alias']
-
+            
+            if if_alias != "":
+                if_display = if_alias
+            else:
+                if_display = if_name
+ 
             if_rx_mbit=cur_if_data['rx_speed_octets']*8/1000/1000
             if_tx_mbit=cur_if_data['tx_speed_octets']*8/1000/1000
             #if_rx_mbyte=cur_if_data['rx_speed_octets']/1000/1000
@@ -398,8 +377,11 @@ class SnmpStatisticsMonitor:
             # if_tx_total_mbit=cur_if_data['tx_octets']*8/1000/1000
 
 
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_name+" BW Out",round(if_tx_mbit,2),'Mbps',"mdi:upload-network-outline")
-            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_name+" BW In",round(if_rx_mbit,2),'Mbps',"mdi:download-network-outline")
+            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbit',if_display+" out",round(if_tx_mbit,2),'Mbps',"mdi:upload-network-outline")
+            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbit',if_display+" in",round(if_rx_mbit,2),'Mbps',"mdi:download-network-outline")
+
+            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_octets_in',if_display+" octets in",int(cur_if_data['rx_octets']),'octets',"mdi:download-network-outline")
+            self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_octets_out',if_display+" octets out",int(cur_if_data['tx_octets']),'octets',"mdi:download-network-outline")
 
             #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
             #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')

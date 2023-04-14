@@ -17,7 +17,7 @@
 					"cpu_and_ram": "Monitor CPU and RAM usage",
 					"disk": "Monitor disk usage",
 					"sessions": "Monitor session count",
-					"interfacesyesno": "Monitor network interfaces [NOT YET READY]",
+					"interfacesyesno": "Monitor network interfaces",
 					"performanceslasyesno": "Monitor performance SLA information"
                 },
                 "title": "Enter firewall details",
