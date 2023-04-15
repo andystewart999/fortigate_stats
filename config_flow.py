@@ -38,7 +38,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                         vol.Required("disk"): bool,
                         vol.Required("sessions"): bool,
                         vol.Optional(CONF_SCAN_INTERVAL, default = DEFAULT_SCAN_INTERVAL): int,
-                        vol.Optional(CONF_INTERFACESYESNO, default = False): bool,
+                        vol.Optional(CONF_INTERFACESYESNO, default = True): bool,
                         vol.Optional(CONF_PERFORMANCESLASYESNO, default = False): bool
                     }
                 ),
