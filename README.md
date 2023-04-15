@@ -5,6 +5,10 @@ Home Assistant integration to show statistics from a FortiGate firewall, via SNM
 - Performance SLA/Link Health status (if enabled on the firewall)
 - Per-interface bandwidth usage sensors for connected interfaces 
 
+TODO:
+- Work out how to support removal of this integration without requiring Home Assistant to restart
+- Work out how to support integration reloading
+
 Tested and working with FortiOS 6.2.11 on a Fortigate 100D.
 
 With thanks to [weltmeyer](https://github.com/weltmeyer) and [wxt9861](https://github.com/wxt9861) for doing most of the heavy lifting!
