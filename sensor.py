@@ -393,7 +393,7 @@ class SnmpStatisticsMonitor:
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_in_byte',if_name+" Total In (bytes)",cur_if_data['rx_octets'],'byte')
 
         if self.include_cpu_and_ram:
-            oids = (OID_CPU_USAGE, OID_RAMUSAGE)
+            oids = (OID_CPUUSAGE, OID_RAMUSAGE)
             errorIndication, oidReturn = snmp_getmulti(ipaddress, username, port, oids)
 
             if not errorIndication:
