@@ -2,9 +2,10 @@
     "domain": "fortigate_stats",
     "name": "FortiGate Stats",
     "documentation": "https://github.com/andystewart999/fortigate_stats",
+    "issue_tracker": "https://github.com/andystewart999/fortigate_stats/issues",
     "dependencies": [],
     "codeowners": ["@andystewart999"],
     "requirements": ["pysnmp"],
     "config_flow": true,
-    "version": "0.5.0"
+    "version": "0.9.6"
 }
