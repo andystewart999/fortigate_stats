@@ -8,7 +8,7 @@ import sys
 
 # pylint: disable=unused-wildcard-import
 from .const import * 
-from .snmp import snmp_getfromtable, snmp_getmultifromtable
+from .snmp import snmp_getfromtable, snmp_getmulti, snmp_getmultifromtable
 
 # pylint: enable=unused-wildcard-import
 import threading
@@ -352,8 +352,6 @@ class SnmpStatisticsMonitor:
     def AddOrUpdateEntities(self):
         allSensorsPrefix = "sensor." + DOMAIN + "_" + self.fw_info[OID_SERIALNUMBER].replace('.','_') + "_"
         
-        #TODO - use the code below as a basis for per-interface sensors
-        
         for k in self.current_if_data:
             cur_if_data=self.current_if_data[k]
             if_name=cur_if_data['name']
@@ -394,22 +392,22 @@ class SnmpStatisticsMonitor:
 
         if self.include_cpu_and_ram:
             oids = (OID_CPUUSAGE, OID_RAMUSAGE)
-            errorIndication, oidReturn = snmp_getmulti(ipaddress, username, port, oids)
+            errorIndication, oidReturn = snmp_getmulti(self.target_ip, self.username, self.port, oids)
 
             if not errorIndication:
-                cpu_usage = oidReturn[0][1].prettyPrint()
-                ram_usage = oidReturn[1][1].prettyPrint()
+                cpu_usage = int(oidReturn[0][1].prettyPrint())
+                ram_usage = int(oidReturn[1][1].prettyPrint())
 
                 self._AddOrUpdateEntity(allSensorsPrefix+"cpu_usage","CPU usage",cpu_usage,'%',"mdi:memory")
                 self._AddOrUpdateEntity(allSensorsPrefix+"ram_usage","RAM usage",ram_usage,'%',"mdi:memory")
 
         if self.include_disk:
             oids = (OID_DISKUSAGE, OID_DISKCAPACITY)
-            errorIndication, oidReturn = snmp_getmulti(ipaddress, username, port, oids)
+            errorIndication, oidReturn = snmp_getmulti(self.target_ip, self.username, self.port, oids)
             
             if not errorIndication:
-                disk_usage = oidReturn[0][1].prettyPrint()
-                disk_capacity = oidReturn[1][1].prettyPrint()
+                disk_usage = int(oidReturn[0][1].prettyPrint())
+                disk_capacity = int(oidReturn[1][1].prettyPrint())
 
                 disk_usagepct = int((disk_usage / disk_capacity) * 100)
                 disk_attrs = (
