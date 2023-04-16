@@ -1,4 +1,4 @@
-"""The snmp_stats integration."""
+"""Fortigate_Stats integration."""
 from .const import *
 import voluptuous as vol
 from homeassistant.helpers import config_validation as cv
