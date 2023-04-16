@@ -34,9 +34,9 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                         vol.Required(CONF_USERNAME): str,
                         vol.Required(CONF_IP_ADDRESS): str,
                         vol.Optional(CONF_PORT, default = DEFAULT_PORT): int,
-                        vol.Required("cpu_and_ram"): bool,
-                        vol.Required("disk"): bool,
-                        vol.Required("sessions"): bool,
+                        vol.Required(CONF_CPUANDRAM): bool,
+                        vol.Required(CONF_DISK): bool,
+                        vol.Required(CONF_SESSIONS): bool,
                         vol.Optional(CONF_SCAN_INTERVAL, default = DEFAULT_SCAN_INTERVAL): int,
                         vol.Optional(CONF_INTERFACESYESNO, default = True): bool,
                         vol.Optional(CONF_PERFORMANCESLASYESNO, default = False): bool
@@ -121,18 +121,7 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                     }
                 ),
             )
-                        
-        try:
-            #Checks here
-            test = "test"
-            
-        except:
-            e = traceback.format_exec()
-            LOGGER.error("Error on Interface form: %s", e)
-            #if ex.errcode == 400:
-            #    return self._show_form({"base": "invalid_credentials"})
-            return self._show_form({"base": "connection_error"})
-        
+                                
         user_input_combined = self.user_input | user_input2 
         self.user_input = user_input_combined
 
@@ -181,17 +170,6 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
 
         performanceslas = user_input3[CONF_PERFORMANCESLAS]
                         
-        try:
-            #We only need to get this information once, so get it as part of the connection test and add it to user_input
-            test2 = "test2"
-            
-        except:
-            e = traceback.format_exec()
-            LOGGER.error("Error on Interface form: %s", e)
-            #if ex.errcode == 400:
-            #    return self._show_form({"base": "invalid_credentials"})
-            return self._show_form({"base": "connection_error"})
-        
         user_input_combined = self.user_input | user_input3
         self.user_input = user_input_combined
         return self.async_create_entry(
