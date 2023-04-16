@@ -1,9 +1,6 @@
-#from pysnmp import hlapi
-#from pysnmp.error import PySnmpError
 import time
 import traceback
-from datetime import datetime
-import sys
+#import sys
 
 # pylint: disable=unused-wildcard-import
 from .const import * 
