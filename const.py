@@ -9,6 +9,9 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_PORT
 )
+CONF_CPUANDRAM = "cpu_and_ram"
+CONF_DISK = "disk"
+CONF_SESSIONS = "sessions"
 CONF_INTERFACESYESNO = "interfacesyesno"
 CONF_INTERFACES = "interfaces"
 CONF_INTERFACESBANDWIDTH="interfacesbandwidth"
