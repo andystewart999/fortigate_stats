@@ -4,7 +4,6 @@ import time
 import traceback
 from datetime import datetime
 import sys
-#from random import randrange
 
 # pylint: disable=unused-wildcard-import
 from .const import * 
@@ -12,7 +11,6 @@ from .snmp import snmp_getfromtable, snmp_getmulti, snmp_getmultifromtable
 
 # pylint: enable=unused-wildcard-import
 import threading
-import time
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.entity import Entity
 
@@ -116,13 +114,9 @@ class SnmpStatisticsSensor(Entity):
     def update(self):
         LOGGER.info("Updated "+self.entity_id)
 
-    #Speculative
     @property
     def device_info(self):
         """Return device info for this sensor."""
-#        if self._config_entry is None:
-#            indentifier = {(DOMAIN, self.config["host"].replace(".", "_"))}
-#        else:
         identifier = {(DOMAIN, self.fw_info[OID_SERIALNUMBER])}
         return {
             "identifiers": identifier,
@@ -145,9 +139,9 @@ class SnmpStatisticsMonitor:
         self.target_ip=config_entry.data.get(CONF_IP_ADDRESS)
         self.port=config_entry.data.get(CONF_PORT)
         self.updateIntervalSeconds=config_entry.data.get(CONF_SCAN_INTERVAL)
-        self.include_cpu_and_ram=config_entry.data.get("cpu_and_ram")
-        self.include_disk=config_entry.data.get("disk")
-        self.include_sessions=config_entry.data.get("sessions")
+        self.include_cpu_and_ram=config_entry.data.get(CONF_CPUANDRAM)
+        self.include_disk=config_entry.data.get(CONF_DISK)
+        self.include_sessions=config_entry.data.get(CONF_SESSIONS)
 
         self.include_interfaces = config_entry.data.get(CONF_INTERFACESYESNO)
         if self.include_interfaces:
@@ -172,74 +166,6 @@ class SnmpStatisticsMonitor:
         if async_add_entities is not None:
             self.setupEntities()
 
-    # #region static methods
-    # @staticmethod
-    # def get(target, oids, credentials, port=161, engine=hlapi.SnmpEngine(), context=hlapi.ContextData()):
-        # handler = hlapi.getCmd(
-            # engine,
-            # credentials,
-            # hlapi.UdpTransportTarget((target, port)),
-            # context,
-            # *__class__.construct_object_types(oids)
-        # )
-        # return __class__.fetch(handler, 1)[0]
-    
-    # @staticmethod
-    # def construct_object_types(list_of_oids):
-        # object_types = []
-        # for oid in list_of_oids:
-            # object_types.append(hlapi.ObjectType(hlapi.ObjectIdentity(oid)))
-        # return object_types
-
-    # @staticmethod
-    # def get_bulk(target, oids, credentials, count, start_from=0, port=161,
-                # engine=hlapi.SnmpEngine(), context=hlapi.ContextData()):
-        # handler = hlapi.bulkCmd(
-            # engine,
-            # credentials,
-            # hlapi.UdpTransportTarget((target, port)),
-            # context,
-            # start_from, count,
-            # *__class__.construct_object_types(oids)
-        # )
-        # return __class__.fetch(handler, count)
-
-    # @staticmethod
-    # def get_bulk_auto(target, oids, credentials, count_oid, start_from=0, port=161,
-                    # engine=hlapi.SnmpEngine(), context=hlapi.ContextData()):
-        # count = __class__.get(target, [count_oid], credentials, port, engine, context)[count_oid]
-        # return __class__.get_bulk(target, oids, credentials, count, start_from, port, engine, context)
-    # @staticmethod
-    # def cast(value):
-        # try:
-            # return int(value)
-        # except (ValueError, TypeError):
-            # try:
-                # return float(value)
-            # except (ValueError, TypeError):
-                # try:
-                    # return str(value)
-                # except (ValueError, TypeError):
-                    # pass
-        # return value
-    # @staticmethod
-    # def fetch(handler, count):
-        # result = []
-        # for i in range(count):
-            # try:
-                # error_indication, error_status, error_index, var_binds = next(handler)
-                # if not error_indication and not error_status:
-                    # items = {}
-                    # for var_bind in var_binds:
-                        # items[str(var_bind[0])] = __class__.cast(var_bind[1])
-                    # result.append(items)
-                # else:
-                    # raise RuntimeError('Got SNMP error: {0}'.format(error_indication))
-            # except StopIteration:
-                # break
-        # return result
-
-    # #endregion
     def update_stats(self):
         self.update_netif_stats()
         
@@ -367,8 +293,6 @@ class SnmpStatisticsMonitor:
             #if_rx_mbyte=cur_if_data['rx_speed_octets']/1000/1000
             #if_tx_mbyte=cur_if_data['tx_speed_octets']/1000/1000
 
-
-
             # if_rx_total_mbit=cur_if_data['rx_octets']*8/1000/1000
             # if_tx_total_mbit=cur_if_data['tx_octets']*8/1000/1000
 
@@ -382,7 +306,6 @@ class SnmpStatisticsMonitor:
 
             #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_out_mbyte',if_name+" BW Out (mbyte)",round(if_tx_mbyte,2),'mbyte/s')
             #self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_curbw_in_mbyte',if_name+" BW In (mbyte)",round(if_rx_mbyte,2),'mbyte/s')
-
 
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_out_mbit',if_name+" Total Out (mbit)",round(if_tx_total_mbit,2),'mbit')
             # self._AddOrUpdateEntity(allSensorsPrefix+"netif_"+if_name+'_total_in_mbit',if_name+" Total In (mbit)",round(if_rx_total_mbit,2),'mbit')
