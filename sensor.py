@@ -1,5 +1,6 @@
 import time
 import traceback
+import asyncio
 #import sys
 
 # pylint: disable=unused-wildcard-import
@@ -34,15 +35,38 @@ async def async_setup_entry(hass, config_entry,async_add_entities):
                 raise
        
     hass.data[DOMAIN][config_entry.entry_id]={"monitor":monitor}
-    
+
+    ### TESTING ###
+    # load platforms
+    for platform in PLATFORMS:
+        hass.async_add_job(
+            hass.config_entries.async_forward_entry_setup(config_entry, platform)
+        )
+    ### TESTING ###
+
     
     monitor.start()
+    
     def _stop_monitor(_event):
         monitor.stopped=True
-    #hass.states.async_set
-    hass.bus.async_listen(EVENT_HOMEASSISTANT_STOP, _stop_monitor)
-    LOGGER.info('Init done')
+        #hass.states.async_set
+        hass.bus.async_listen(EVENT_HOMEASSISTANT_STOP, _stop_monitor)
+        LOGGER.info('Init done')
+        return True
+
+### TESTING ###
+async def async_unload_entry(hass, config_entry):
+    """Handle removal of an entry."""
+    await asyncio.gather(
+        *[
+            hass.config_entries.async_forward_entry_unload(config_entry, platform)
+            for platform in PLATFORMS
+        ]
+    )
+    LOGGER.info("Successfully removed the FortiGate Stats integration")
+
     return True
+### TESTING ###
 
 
 class SnmpStatisticsSensor(Entity):

@@ -38,6 +38,7 @@ LOGGER = logging.getLogger(__package__)
 DOMAIN = "fortigate_stats"
 DEFAULT_SCAN_INTERVAL = 10
 DEFAULT_PORT = 161
+PLATFORMS = ["sensor"]
 
 #OIDS
 OID_HOSTNAME = '1.3.6.1.2.1.1.5.0'
