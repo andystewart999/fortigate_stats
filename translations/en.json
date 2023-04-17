@@ -20,8 +20,8 @@
 					"interfacesyesno": "Monitor network interfaces",
 					"performanceslasyesno": "Monitor performance SLA information"
                 },
-                "title": "Enter firewall details",
-				"description": "TO BE ADDED"
+                "title": "FortiGate Stats",
+				"description": "Enter the appropriate SNMP connection information, and select which types of data you would like to create sensors for."
             },
             "interfaces": {
                 "data": {
@@ -29,8 +29,8 @@
 					"interfacesbandwidth": "Include bandwidth metrics",
 					"interfacesoctets": "Include bandwidth octets"
                 },
-                "title": "Firewall interfaces",
-				"description": "Select which network interfaces to monitor.  Note that only currently connected interfaces are shown."
+                "title": "FortiGate Stats",
+				"description": "Select which network interfaces to monitor, and which types of data you'd like sensors created for.  Note that only currently connected interfaces are shown."
             },
             "performanceslas": {
                 "data": {
@@ -39,8 +39,8 @@
 					"performanceslaslinkmetrics": "Include network state metrics",
 					"performanceslasbandwidthprobe": "Include probe bandwidth metrics"
                 },
-                "title": "Performance SLAs",
-				"description": "Select which performance SLAs to monitor, and the network metrics for each one."
+                "title": "FortiGate Stats",
+				"description": "Select which performance SLAs to monitor, and the network metrics for each one that should be monitored."
             }
         },
         "title": "Fortigate Stats"
