@@ -23,13 +23,13 @@ CONF_PERFORMANCESLASBANDWIDTHPROBE = "performanceslasbandwidthprobe"
 CONF_PERFORMANCESLASSTATE = "performanceslasstate"
 
 PERFORMANCESLAS_STATE = {
-                    0: "Alive",
-                    1: "Dead"
+                    "0": "Alive",
+                    "1": "Dead"
                 }
 
 PERFORMANCESLAS_ICON = {
-                    0: "mdi:timeline-check-outline",
-                    1: "mdi:timeline-remove-outline"
+                    "0": "mdi:timeline-check-outline",
+                    "1": "mdi:timeline-remove-outline"
                 }
     
 
