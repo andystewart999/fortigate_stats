@@ -34,9 +34,9 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                         vol.Required(CONF_USERNAME): str,
                         vol.Required(CONF_IP_ADDRESS): str,
                         vol.Optional(CONF_PORT, default = DEFAULT_PORT): int,
-                        vol.Required(CONF_CPUANDRAM): bool,
-                        vol.Required(CONF_DISK): bool,
-                        vol.Required(CONF_SESSIONS): bool,
+                        vol.Required(CONF_CPUANDRAM, default = True): bool,
+                        vol.Required(CONF_DISK, default = True): bool,
+                        vol.Required(CONF_SESSIONS, default = True): bool,
                         vol.Optional(CONF_SCAN_INTERVAL, default = DEFAULT_SCAN_INTERVAL): int,
                         vol.Optional(CONF_INTERFACESYESNO, default = True): bool,
                         vol.Optional(CONF_PERFORMANCESLASYESNO, default = False): bool
