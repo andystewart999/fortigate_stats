@@ -2,8 +2,8 @@
 Home Assistant integration to show statistics from a FortiGate firewall, via SNMP
 - CPU, RAM and Disk usage
 - Session count
-- Performance SLA/Link Health status (if enabled on the firewall)
 - Per-interface bandwidth usage sensors for connected interfaces 
+- Performance SLA/Link Health status (if enabled on the firewall)
 
 Tested and working with FortiOS 6.2.11 on a Fortigate 100D.
 
