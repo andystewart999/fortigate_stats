@@ -74,11 +74,11 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
             return await self.async_step_interfaces()
         elif user_input[CONF_PERFORMANCESLASYESNO]:
             return await self.async_step_performanceslas()
-        else:
-            return self.async_create_entry(
-                title=user_input[OID_HOSTNAME],
-                data=user_input
-            )
+
+        return self.async_create_entry(
+            title=user_input[OID_HOSTNAME],
+            data=user_input
+        )
 
     async def async_step_interfaces(self,user_input2 = None):
         """Second page of the flow."""
@@ -122,17 +122,14 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
                 ),
             )
                                 
-        user_input_combined = self.user_input | user_input2 
-        self.user_input = user_input_combined
+        #Is there a better way of doing this?
+        self.user_input = self.user_input | user_input2
 
-        # Do we need to show the next flow forms?
+        # Do we need to show the next flow form?
         if self.user_input[CONF_PERFORMANCESLASYESNO]:
             return await self.async_step_performanceslas()
-        else:
-            return self.async_create_entry(
-                title=self.user_input[OID_HOSTNAME],
-                data=self.user_input
-            )
+
+        return
     
     async def async_step_performanceslas(self,user_input3 = None):
         """Second page of the flow."""
@@ -170,13 +167,11 @@ class ConfigFlowHandler(config_entries.ConfigFlow,domain=DOMAIN):
 
         performanceslas = user_input3[CONF_PERFORMANCESLAS]
                         
-        user_input_combined = self.user_input | user_input3
-        self.user_input = user_input_combined
-        return self.async_create_entry(
-            title=self.user_input[OID_HOSTNAME],
-            data=self.user_input
-        )
-
+        #Is there a better way of doing this?
+        self.user_input = self.user_input | user_input3
+        
+        return
+        
     @callback
     def _show_form(self, step_id,data_schema,errors = None):
         """Show the form to the user."""
